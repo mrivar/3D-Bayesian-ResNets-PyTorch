@@ -5,7 +5,8 @@ from torch.autograd import Variable
 import math
 from functools import partial
 
-from models.BayesianLayers.BBBLayers import BBBConv3d, BBBLinearFactorial
+from models.BayesianLayers.BBBlayers import BBBConv3d, BBBLinearFactorial
+from models.BayesianLayers.BBBmodules import BBBSequential
 
 __all__ = [
     'BBBResNet', 'resnet10', 'resnet18', 'resnet34', 'resnet50', 'resnet101',
@@ -36,11 +37,11 @@ def downsample_basic_block(x, planes, stride):
     return out
 
 
-class BasicBlock(nn.Module):
+class BBBBasicBlock(nn.Module):
     expansion = 1
 
     def __init__(self, inplanes, planes, stride=1, downsample=None):
-        super(BasicBlock, self).__init__()
+        super(BBBBasicBlock, self).__init__()
         self.conv1 = BBBconv3x3x3(inplanes, planes, stride)
         self.bn1 = nn.BatchNorm3d(planes)
         self.relu = nn.ReLU(inplace=True)
@@ -50,29 +51,36 @@ class BasicBlock(nn.Module):
         self.stride = stride
 
     def forward(self, x):
+        kl = 0
         residual = x
 
-        out = self.conv1(x)
+        out, _kl = self.conv1(x)
+        kl += _kl
         out = self.bn1(out)
         out = self.relu(out)
 
-        out = self.conv2(out)
+        out, _kl = self.conv2(out)
+        kl += _kl
         out = self.bn2(out)
 
         if self.downsample is not None:
-            residual = self.downsample(x)
+            try:
+                residual, _kl = self.downsample(x)
+                kl += _kl
+            except:
+                residual = self.downsample(x)
 
         out += residual
         out = self.relu(out)
 
-        return out
+        return out, kl
 
 
-class Bottleneck(nn.Module):
+class BBBBottleneck(nn.Module):
     expansion = 4
 
     def __init__(self, inplanes, planes, stride=1, downsample=None):
-        super(Bottleneck, self).__init__()
+        super(BBBBottleneck, self).__init__()
         self.conv1 = BBBConv3d(inplanes, planes, kernel_size=1)
         self.bn1 = nn.BatchNorm3d(planes)
         self.conv2 = BBBConv3d(
@@ -87,24 +95,31 @@ class Bottleneck(nn.Module):
     def forward(self, x):
         residual = x
 
-        out = self.conv1(x)
+        out, _kl = self.conv1(x)
+        kl += _kl
         out = self.bn1(out)
         out = self.relu(out)
 
-        out = self.conv2(out)
+        out, _kl = self.conv2(out)
+        kl += _kl
         out = self.bn2(out)
         out = self.relu(out)
 
-        out = self.conv3(out)
+        out, _kl = self.conv3(out)
+        kl += _kl
         out = self.bn3(out)
 
         if self.downsample is not None:
-            residual = self.downsample(x)
+            try:
+                residual, _kl = self.downsample(x)
+                kl += _kl
+            except:
+                residual = self.downsample(x)
 
         out += residual
         out = self.relu(out)
 
-        return out
+        return out, kl
 
 
 class BBBResNet(nn.Module):
@@ -156,7 +171,7 @@ class BBBResNet(nn.Module):
                     planes=planes * block.expansion,
                     stride=stride)
             else:
-                downsample = nn.Sequential(
+                downsample = BBBSequential(
                     BBBConv3d(
                         self.inplanes,
                         planes * block.expansion,
@@ -169,25 +184,34 @@ class BBBResNet(nn.Module):
         for i in range(1, blocks):
             layers.append(block(self.inplanes, planes))
 
-        return nn.Sequential(*layers)
+        return BBBSequential(*layers)
 
     def forward(self, x):
-        x = self.conv1(x)
+        'Forward pass with Bayesian weights'
+        kl = 0
+
+        x, _kl = self.conv1(x)
+        kl += _kl
         x = self.bn1(x)
         x = self.relu(x)
         x = self.maxpool(x)
 
-        x = self.layer1(x)
-        x = self.layer2(x)
-        x = self.layer3(x)
-        x = self.layer4(x)
+        x, _kl = self.layer1(x)
+        kl += _kl
+        x, _kl = self.layer2(x)
+        kl += _kl
+        x, _kl = self.layer3(x)
+        kl += _kl
+        x, _kl = self.layer4(x)
+        kl += _kl
 
         x = self.avgpool(x)
 
         x = x.view(x.size(0), -1)
-        x = self.fc(x)
+        x, _kl = self.fc(x)
+        kl += _kl
 
-        return x
+        return x, kl
 
 
 def get_fine_tuning_parameters(model, ft_begin_index):
@@ -214,47 +238,47 @@ def get_fine_tuning_parameters(model, ft_begin_index):
 def resnet10(**kwargs):
     """Constructs a ResNet-10 model.
     """
-    model = BBBResNet(BasicBlock, [1, 1, 1, 1], **kwargs)
+    model = BBBResNet(BBBBasicBlock, [1, 1, 1, 1], **kwargs)
     return model
 
 
 def resnet18(**kwargs):
     """Constructs a ResNet-18 model.
     """
-    model = BBBResNet(BasicBlock, [2, 2, 2, 2], **kwargs)
+    model = BBBResNet(BBBBasicBlock, [2, 2, 2, 2], **kwargs)
     return model
 
 
 def resnet34(**kwargs):
     """Constructs a ResNet-34 model.
     """
-    model = BBBResNet(BasicBlock, [3, 4, 6, 3], **kwargs)
+    model = BBBResNet(BBBBasicBlock, [3, 4, 6, 3], **kwargs)
     return model
 
 
 def resnet50(**kwargs):
     """Constructs a ResNet-50 model.
     """
-    model = BBBResNet(Bottleneck, [3, 4, 6, 3], **kwargs)
+    model = BBBResNet(BBBBottleneck, [3, 4, 6, 3], **kwargs)
     return model
 
 
 def resnet101(**kwargs):
     """Constructs a ResNet-101 model.
     """
-    model = BBBResNet(Bottleneck, [3, 4, 23, 3], **kwargs)
+    model = BBBResNet(BBBBottleneck, [3, 4, 23, 3], **kwargs)
     return model
 
 
 def resnet152(**kwargs):
     """Constructs a ResNet-152 model.
     """
-    model = BBBResNet(Bottleneck, [3, 8, 36, 3], **kwargs)
+    model = BBBResNet(BBBBottleneck, [3, 8, 36, 3], **kwargs)
     return model
 
 
 def resnet200(**kwargs):
     """Constructs a ResNet-200 model.
     """
-    model = BBBResNet(Bottleneck, [3, 24, 36, 3], **kwargs)
+    model = BBBResNet(BBBBottleneck, [3, 24, 36, 3], **kwargs)
     return model

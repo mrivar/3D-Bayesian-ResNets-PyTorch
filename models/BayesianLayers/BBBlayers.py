@@ -120,7 +120,7 @@ class BBBConv2d(_ConvNd):
         super(BBBConv2d, self).__init__(in_channels, out_channels, kernel_size, stride, padding, dilation, _pair(0), groups)
 
     def forward(self, input):
-        raise NotImplementedError()
+        return self.convprobforward(input)
 
     def convprobforward(self, input):
         """
@@ -170,7 +170,7 @@ class BBBConv3d(_ConvNd):
         super(BBBConv3d, self).__init__(in_channels, out_channels, kernel_size, stride, padding, dilation, _triple(0), groups)
 
     def forward(self, input):
-        raise NotImplementedError()
+        return self.convprobforward(input)
 
     def convprobforward(self, input):
         """
@@ -265,7 +265,7 @@ class BBBLinearFactorial(nn.Module):
         self.log_alpha.data.uniform_(-stdv, stdv)
 
     def forward(self, input):
-        raise NotImplementedError()
+        return self.fcprobforward(input)
 
     def fcprobforward(self, input):
         """
