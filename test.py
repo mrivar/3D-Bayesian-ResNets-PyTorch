@@ -40,7 +40,10 @@ def test(data_loader, model, opt, class_names):
         data_time.update(time.time() - end_time)
 
         inputs = Variable(inputs, volatile=True)
-        outputs = model(inputs)
+        if opt.bayesian:
+            outputs, _ = model(inputs)
+        else:
+            outputs = model(inputs)
         if not opt.no_softmax_in_test:
             outputs = F.softmax(outputs)
 

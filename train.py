@@ -5,7 +5,9 @@ import os
 import sys
 
 from utils import AverageMeter, calculate_accuracy
+from models.BayesianLayers.BBBlayers import GaussianVariationalInference
 
+vi = GaussianVariationalInference(torch.nn.CrossEntropyLoss())
 
 def train_epoch(epoch, data_loader, model, criterion, optimizer, opt,
                 epoch_logger, batch_logger):
@@ -17,6 +19,7 @@ def train_epoch(epoch, data_loader, model, criterion, optimizer, opt,
     data_time = AverageMeter()
     losses = AverageMeter()
     accuracies = AverageMeter()
+    m = math.ceil(len(data_loader) / opt.batch_size)
 
     end_time = time.time()
     for i, (inputs, targets) in enumerate(data_loader):
@@ -26,8 +29,22 @@ def train_epoch(epoch, data_loader, model, criterion, optimizer, opt,
             targets = targets.cuda(async=True)
         inputs = Variable(inputs)
         targets = Variable(targets)
-        outputs = model(inputs)
-        loss = criterion(outputs, targets)
+        if opt.bayesian:
+            # Calculate beta
+            if opt.beta_type is "Blundell":
+                beta = 2 ** (m - (i + 1)) / (2 ** m - 1)
+            elif opt.beta_type is "Soenderby":
+                beta = min(epoch / (opt.n_epochs // 4), 1)
+            elif opt.beta_type is "Standard":
+                beta = 1 / m
+            else:
+                beta = 0
+            # Forward Propagation (with KL calc.)
+            outputs, kl = model(inputs)
+            loss = vi(outputs, targets, kl, beta)
+        else:
+            outputs = model(inputs)
+            loss = criterion(outputs, targets)
         acc = calculate_accuracy(outputs, targets)
 
         losses.update(loss.data[0], inputs.size(0))

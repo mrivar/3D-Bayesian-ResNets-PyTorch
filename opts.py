@@ -217,10 +217,6 @@ def parse_opts():
         type=int,
         help='Depth of resnet (10 | 18 | 34 | 50 | 101)')
     parser.add_argument(
-        '--bayesian',
-        action='store_true',
-        help='Set true if model is bayesian. It is set automatically.')
-    parser.add_argument(
         '--resnet_shortcut',
         default='B',
         type=str,
@@ -234,6 +230,15 @@ def parse_opts():
         help='ResNeXt cardinality')
     parser.add_argument(
         '--manual_seed', default=1, type=int, help='Manually set random seed')
+    # Bayesian options
+    parser.add_argument(
+        '--bayesian',
+        action='store_true',
+        help='Set true if model is bayesian. It is set automatically.')
+    parser.add_argument('--beta_type',
+        default="Blundell",
+        type=str,
+        help='Beta type ( Bloendell | Soenderby | Standard | ')
 
     args = parser.parse_args()
 
