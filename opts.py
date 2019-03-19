@@ -1,8 +1,16 @@
 import argparse
+from os.path import isdir
+
+from constants import *
 
 
 def parse_opts():
     parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--dataset',
+        default='kinetics',
+        type=str,
+        help='Used dataset (activitynet | kinetics | ucf101 | hmdb51)')
     parser.add_argument(
         '--root_path',
         default='/root/data/ActivityNet',
@@ -23,11 +31,6 @@ def parse_opts():
         default='results',
         type=str,
         help='Result directory path')
-    parser.add_argument(
-        '--dataset',
-        default='kinetics',
-        type=str,
-        help='Used dataset (activitynet | kinetics | ucf101 | hmdb51)')
     parser.add_argument(
         '--n_classes',
         default=400,
@@ -229,5 +232,13 @@ def parse_opts():
         '--manual_seed', default=1, type=int, help='Manually set random seed')
 
     args = parser.parse_args()
+
+    args.root_path = ROOT_PATH[args.dataset]
+    if(isdir('/var/scratch/delariva/')):
+        FLAGS.root_path = '/var/scratch/delariva/' + FLAGS.root_path
+
+    args.video_path = VIDEO_PATH[args.dataset]
+    args.annotation_path = args.dataset + ".json"
+    args.n_classes = NUM_CLASSES[args.dataset]
 
     return args
