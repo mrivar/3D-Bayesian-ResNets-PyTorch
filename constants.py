@@ -14,3 +14,10 @@ NUM_CLASSES = {'mnist': 10,
                'ucf101': 101,
                'activitynet': 200,
                'kinetics': 400}
+
+BAYESIAN = {'resnet': False,
+            'preresnet': False,
+            'wideresnet': False,
+            'resnext': False,
+            'densenet': False,
+            'BBBresnet': True}

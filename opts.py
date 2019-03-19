@@ -210,12 +210,16 @@ def parse_opts():
         '--model',
         default='resnet',
         type=str,
-        help='(resnet | preresnet | wideresnet | resnext | densenet | ')
+        help='(resnet | preresnet | wideresnet | resnext | densenet | BBBresnet | ')
     parser.add_argument(
         '--model_depth',
         default=18,
         type=int,
         help='Depth of resnet (10 | 18 | 34 | 50 | 101)')
+    parser.add_argument(
+        '--bayesian',
+        action='store_true',
+        help='Set true if model is bayesian. It is set automatically.')
     parser.add_argument(
         '--resnet_shortcut',
         default='B',
@@ -240,5 +244,6 @@ def parse_opts():
     args.video_path = VIDEO_PATH[args.dataset]
     args.annotation_path = args.dataset + ".json"
     args.n_classes = NUM_CLASSES[args.dataset]
+    args.bayesian = BAYESIAN[args.model]
 
     return args
