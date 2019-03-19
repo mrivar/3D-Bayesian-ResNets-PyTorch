@@ -4,7 +4,7 @@ from torch import nn
 from torch.nn import Parameter
 import torch.nn.functional as F
 from .BBBdistributions import Normal, Normalout, distribution_selector
-from torch.nn.modules.utils import _pair
+from torch.nn.modules.utils import _pair, _triple
 
 cuda = torch.cuda.is_available()
 
@@ -133,6 +133,56 @@ class BBBConv2d(_ConvNd):
         conv_qw_mean = F.conv2d(input=input, weight=self.qw_mean, stride=self.stride, padding=self.padding,
                                 dilation=self.dilation, groups=self.groups)
         conv_qw_std = torch.sqrt(1e-8 + F.conv2d(input=input.pow(2), weight=torch.exp(self.log_alpha)*self.qw_mean.pow(2),
+                                                 stride=self.stride, padding=self.padding, dilation=self.dilation, groups=self.groups))
+
+        if cuda:
+            conv_qw_mean.cuda()
+            conv_qw_std.cuda()
+
+        # sample from output
+        if cuda:
+            output = conv_qw_mean + conv_qw_std * (torch.randn(conv_qw_mean.size())).cuda()
+        else:
+            output = conv_qw_mean + conv_qw_std * (torch.randn(conv_qw_mean.size()))
+
+        if cuda:
+            output.cuda()
+
+        w_sample = self.conv_qw.sample()
+
+        # KL divergence
+        qw_logpdf = self.conv_qw.logpdf(w_sample)
+
+        kl = torch.sum(qw_logpdf - self.pw.logpdf(w_sample))
+
+        return output, kl
+
+
+class BBBConv3d(_ConvNd):
+    def __init__(self, in_channels, out_channels, kernel_size, stride=1,
+                 padding=0, dilation=1, groups=1):
+
+        kernel_size = _triple(kernel_size)
+        stride = _triple(stride)
+        padding = _triple(padding)
+        dilation = _triple(dilation)
+
+        super(BBBConv3d, self).__init__(in_channels, out_channels, kernel_size, stride, padding, dilation, _triple(0), groups)
+
+    def forward(self, input):
+        raise NotImplementedError()
+
+    def convprobforward(self, input):
+        """
+        Convolutional probabilistic forwarding method.
+        :param input: data tensor
+        :return: output, KL-divergence
+        """
+
+        # local reparameterization trick for convolutional layer
+        conv_qw_mean = F.conv3d(input=input, weight=self.qw_mean, stride=self.stride, padding=self.padding,
+                                dilation=self.dilation, groups=self.groups)
+        conv_qw_std = torch.sqrt(1e-8 + F.conv3d(input=input.pow(2), weight=torch.exp(self.log_alpha)*self.qw_mean.pow(2),
                                                  stride=self.stride, padding=self.padding, dilation=self.dilation, groups=self.groups))
 
         if cuda:
