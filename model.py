@@ -1,12 +1,14 @@
 import torch
 from torch import nn
 
-from models import resnet, pre_act_resnet, wide_resnet, resnext, densenet
+from models import resnet, pre_act_resnet, wide_resnet, resnext, densenet,
+                BBBresnet
 
 
 def generate_model(opt):
     assert opt.model in [
-        'resnet', 'preresnet', 'wideresnet', 'resnext', 'densenet'
+        'resnet', 'preresnet', 'wideresnet', 'resnext', 'densenet',
+        'BBBresnet'
     ]
 
     if opt.model == 'resnet':
@@ -52,6 +54,53 @@ def generate_model(opt):
                 sample_duration=opt.sample_duration)
         elif opt.model_depth == 200:
             model = resnet.resnet200(
+                num_classes=opt.n_classes,
+                shortcut_type=opt.resnet_shortcut,
+                sample_size=opt.sample_size,
+                sample_duration=opt.sample_duration)
+    elif opt.model == 'BBBresnet':
+        assert opt.model_depth in [10, 18, 34, 50, 101, 152, 200]
+
+        from models.BBBresnet import get_fine_tuning_parameters
+
+        if opt.model_depth == 10:
+            model = BBBresnet.resnet10(
+                num_classes=opt.n_classes,
+                shortcut_type=opt.resnet_shortcut,
+                sample_size=opt.sample_size,
+                sample_duration=opt.sample_duration)
+        elif opt.model_depth == 18:
+            model = BBBresnet.resnet18(
+                num_classes=opt.n_classes,
+                shortcut_type=opt.resnet_shortcut,
+                sample_size=opt.sample_size,
+                sample_duration=opt.sample_duration)
+        elif opt.model_depth == 34:
+            model = BBBresnet.resnet34(
+                num_classes=opt.n_classes,
+                shortcut_type=opt.resnet_shortcut,
+                sample_size=opt.sample_size,
+                sample_duration=opt.sample_duration)
+        elif opt.model_depth == 50:
+            model = BBBresnet.resnet50(
+                num_classes=opt.n_classes,
+                shortcut_type=opt.resnet_shortcut,
+                sample_size=opt.sample_size,
+                sample_duration=opt.sample_duration)
+        elif opt.model_depth == 101:
+            model = BBBresnet.resnet101(
+                num_classes=opt.n_classes,
+                shortcut_type=opt.resnet_shortcut,
+                sample_size=opt.sample_size,
+                sample_duration=opt.sample_duration)
+        elif opt.model_depth == 152:
+            model = BBBresnet.resnet152(
+                num_classes=opt.n_classes,
+                shortcut_type=opt.resnet_shortcut,
+                sample_size=opt.sample_size,
+                sample_duration=opt.sample_duration)
+        elif opt.model_depth == 200:
+            model = BBBresnet.resnet200(
                 num_classes=opt.n_classes,
                 shortcut_type=opt.resnet_shortcut,
                 sample_size=opt.sample_size,
