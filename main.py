@@ -50,6 +50,10 @@ if __name__ == '__main__':
     if not opt.no_cuda:
         criterion = criterion.cuda()
 
+    if opt.bayesian:
+        from models.BayesianLayers.BBBlayers import GaussianVariationalInference
+        criterion = GaussianVariationalInference(criterion)
+
     if opt.no_mean_norm and not opt.std_norm:
         norm_method = Normalize([0, 0, 0], [1, 1, 1])
     elif not opt.std_norm:

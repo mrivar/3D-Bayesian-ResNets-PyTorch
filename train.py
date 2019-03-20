@@ -5,9 +5,7 @@ import os
 import sys
 
 from utils import AverageMeter, calculate_accuracy
-from models.BayesianLayers.BBBlayers import GaussianVariationalInference
 
-vi = GaussianVariationalInference(torch.nn.CrossEntropyLoss())
 
 def train_epoch(epoch, data_loader, model, criterion, optimizer, opt,
                 epoch_logger, batch_logger):
@@ -41,7 +39,7 @@ def train_epoch(epoch, data_loader, model, criterion, optimizer, opt,
                 beta = 0
             # Forward Propagation (with KL calc.)
             outputs, kl = model(inputs)
-            loss = vi(outputs, targets, kl, beta)
+            loss = criterion(outputs, targets, kl, beta)
         else:
             outputs = model(inputs)
             loss = criterion(outputs, targets)
