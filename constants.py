@@ -1,4 +1,5 @@
 from time import strftime
+from os import makedirs
 from os.path import isdir
 
 ROOT_PATH = {'mnist': None,
@@ -43,4 +44,5 @@ def create_results_dir_name(args):
       strftime("%m_%d"),
       counter)
     if not isdir(name): break
+  makedirs(name)
   return name
