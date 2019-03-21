@@ -27,11 +27,11 @@ if __name__ == '__main__':
     if opt.root_path != '':
         opt.video_path = os.path.join(opt.root_path, opt.video_path)
         opt.annotation_path = os.path.join(opt.root_path, opt.annotation_path)
-        opt.result_path = os.path.join(opt.root_path, opt.result_path)
-        if opt.resume_path:
-            opt.resume_path = os.path.join(opt.root_path, opt.resume_path)
-        if opt.pretrain_path:
-            opt.pretrain_path = os.path.join(opt.root_path, opt.pretrain_path)
+        #opt.result_path = os.path.join(opt.root_path, opt.result_path)
+        #if opt.resume_path:
+        #    opt.resume_path = os.path.join(opt.root_path, opt.resume_path)
+        #if opt.pretrain_path:
+        #    opt.pretrain_path = os.path.join(opt.root_path, opt.pretrain_path)
     opt.scales = [opt.initial_scale]
     for i in range(1, opt.n_scales):
         opt.scales.append(opt.scales[-1] * opt.scale_step)

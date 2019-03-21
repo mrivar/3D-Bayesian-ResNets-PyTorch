@@ -230,6 +230,12 @@ def parse_opts():
         help='ResNeXt cardinality')
     parser.add_argument(
         '--manual_seed', default=1, type=int, help='Manually set random seed')
+    # Extra options
+    parser.add_argument(
+        '--split',
+        default=1,
+        type=int,
+        help='Split. Dataset: ( HMDB51 )')
     # Bayesian options
     parser.add_argument(
         '--bayesian',
@@ -244,10 +250,11 @@ def parse_opts():
 
     args.root_path = ROOT_PATH[args.dataset]
     if(isdir('/var/scratch/delariva/')):
-        FLAGS.root_path = '/var/scratch/delariva/' + FLAGS.root_path
+        args.root_path = '/var/scratch/delariva/%s'%args.root_path
 
     args.video_path = VIDEO_PATH[args.dataset]
-    args.annotation_path = args.dataset + ".json"
+    args.annotation_path = ANNOTATION_PATH[args.dataset]%args.split
+    args.result_path = create_results_dir_name(args)
     args.n_classes = NUM_CLASSES[args.dataset]
     args.bayesian = BAYESIAN[args.model]
 
