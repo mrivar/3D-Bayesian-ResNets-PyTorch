@@ -1,7 +1,7 @@
 import torch
 from torch import nn
 
-from models import resnet, pre_act_resnet, wide_resnet, resnext, densenet,
+from models import resnet, pre_act_resnet, wide_resnet, resnext, densenet,\
                 BBBresnet
 
 
