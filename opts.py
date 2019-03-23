@@ -1,6 +1,7 @@
 import argparse
-from os.path import isdir
+import os
 
+from mean import get_mean, get_std
 from constants import *
 
 
@@ -248,8 +249,9 @@ def parse_opts():
 
     args = parser.parse_args()
 
+    # Constants
     args.root_path = ROOT_PATH[args.dataset]
-    if(isdir('/var/scratch/delariva/')):
+    if(os.path.isdir('/var/scratch/delariva/')):
         args.root_path = '/var/scratch/delariva/%s'%args.root_path
 
     args.video_path = VIDEO_PATH[args.dataset]
@@ -257,5 +259,26 @@ def parse_opts():
     args.result_path = create_results_dir_name(args)
     args.n_classes = NUM_CLASSES[args.dataset]
     args.bayesian = BAYESIAN[args.model]
+
+
+    # Build opts
+    if args.root_path != '':
+        args.video_path = os.path.join(args.root_path, args.video_path)
+        args.annotation_path = os.path.join(args.root_path, args.annotation_path)
+        args.result_path = os.path.join(args.root_path, args.result_path)
+        os.makedirs(args.result_path)
+        if args.resume_path:
+            args.resume_path = os.path.join(args.root_path, args.resume_path)
+        if args.pretrain_path:
+            args.pretrain_path = os.path.join(args.root_path, args.pretrain_path)
+    args.scales = [args.initial_scale]
+    for i in range(1, args.n_scales):
+        args.scales.append(args.scales[-1] * args.scale_step)
+    args.arch = '{}-{}'.format(args.model, args.model_depth)
+    args.mean = get_mean(args.norm_value, dataset=args.mean_dataset)
+    args.std = get_std(args.norm_value)
+    print(args)
+    with open(os.path.join(args.result_path, 'opts.json'), 'w') as opt_file:
+        json.dump(vars(args), opt_file)
 
     return args
