@@ -39,7 +39,8 @@ def test(data_loader, model, opt, class_names):
     for i, (inputs, targets) in enumerate(data_loader):
         data_time.update(time.time() - end_time)
 
-        inputs = Variable(inputs, volatile=True)
+        with torch.no_grad():
+            inputs = Variable(inputs)#, volatile=True)
         if opt.bayesian:
             outputs, _ = model(inputs)
         else:

@@ -27,7 +27,8 @@ class _ConvNd(nn.Module):
     """
 
     def __init__(self, in_channels, out_channels, kernel_size, stride,
-                 padding, dilation, output_padding, groups, p_logvar_init=-3, p_pi=1.0, q_logvar_init=-5):
+                 padding, dilation, output_padding, groups, p_logvar_init=-3, p_pi=1.0, q_logvar_init=-5,
+                 bias=None):
         super(_ConvNd, self).__init__()
         if in_channels % groups != 0:
             raise ValueError('in_channels must be divisible by groups')
@@ -42,6 +43,7 @@ class _ConvNd(nn.Module):
         self.dilation = dilation
         self.output_padding = output_padding
         self.groups = groups
+        self.bias = bias
 
         # initialize log variance of p and q
         self.p_logvar_init = p_logvar_init

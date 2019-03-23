@@ -22,13 +22,30 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger):
 
         if not opt.no_cuda:
             targets = targets.cuda(async=True)
-        inputs = Variable(inputs, volatile=True)
-        targets = Variable(targets, volatile=True)
-        outputs = model(inputs)
-        loss = criterion(outputs, targets)
+        with torch.no_grad():
+            inputs = Variable(inputs)#, volatile=True)
+            targets = Variable(targets)#, volatile=True)
+
+        if opt.bayesian:
+            # Calculate beta
+            if opt.beta_type is "Blundell":
+                beta = 2 ** (m - (i + 1)) / (2 ** m - 1)
+            elif opt.beta_type is "Soenderby":
+                beta = min(epoch / (opt.n_epochs // 4), 1)
+            elif opt.beta_type is "Standard":
+                beta = 1 / m
+            else:
+                beta = 0
+            # Forward Propagation (with KL calc.)
+            outputs, kl = model(inputs)
+            loss = criterion(outputs, targets, kl, beta)
+        else:
+            outputs = model(inputs)
+            loss = criterion(outputs, targets)
         acc = calculate_accuracy(outputs, targets)
 
-        losses.update(loss.data[0], inputs.size(0))
+        try: losses.update(loss.data[0], inputs.size(0))
+        except: losses.update(loss.data.item(), inputs.size(0))
         accuracies.update(acc, inputs.size(0))
 
         batch_time.update(time.time() - end_time)

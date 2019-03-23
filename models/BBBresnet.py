@@ -132,7 +132,7 @@ class BBBResNet(nn.Module):
                  shortcut_type='B',
                  num_classes=400):
         self.inplanes = 64
-        super(ResNet, self).__init__()
+        super(BBBResNet, self).__init__()
         self.conv1 = BBBConv3d(
             3,
             64,
