@@ -261,7 +261,8 @@ def parse_opts():
         args.root_path = '/var/scratch/delariva/%s'%args.root_path
 
     args.video_path = VIDEO_PATH[args.dataset]
-    args.annotation_path = ANNOTATION_PATH[args.dataset]%args.split
+    try: args.annotation_path = ANNOTATION_PATH[args.dataset]%args.split
+    except: args.annotation_path = ANNOTATION_PATH[args.dataset]
     args.result_path = args.result_path or create_results_dir_name(args)
     args.n_classes = NUM_CLASSES[args.dataset]
     args.bayesian = BAYESIAN[args.model]
@@ -271,9 +272,11 @@ def parse_opts():
     if args.root_path != '':
         args.video_path = os.path.join(args.root_path, args.video_path)
         args.annotation_path = os.path.join(args.root_path, args.annotation_path)
-        args.result_path = os.path.join(args.root_path, args.result_path)
+        args.checkpoints_path = os.path.join(args.root_path, args.result_path)
         if not os.path.isdir(args.result_path):
             os.makedirs(args.result_path)
+        if not os.path.isdir(args.checkpoints_path):
+            os.makedirs(args.checkpoints_path)
         if args.resume_path:
             args.resume_path = os.path.join(args.root_path, args.resume_path)
         if args.pretrain_path:
