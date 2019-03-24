@@ -34,7 +34,6 @@ BAYESIAN = {'resnet': False,
 
 def create_results_dir_name(args):
   counter = 0
-  RESULT_PATH = os.path.join(args.root_path, RESULT_PATH)
   while True:
     counter += 1
     name = RESULT_PATH%(
