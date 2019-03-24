@@ -1,6 +1,5 @@
 import os
 import sys
-import json
 import numpy as np
 import torch
 from torch import nn
@@ -9,7 +8,6 @@ from torch.optim import lr_scheduler
 
 from opts import parse_opts
 from model import generate_model
-from mean import get_mean, get_std
 from spatial_transforms import (
     Compose, Normalize, Scale, CenterCrop, CornerCrop, MultiScaleCornerCrop,
     MultiScaleRandomCrop, RandomHorizontalFlip, ToTensor)

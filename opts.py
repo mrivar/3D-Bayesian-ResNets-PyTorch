@@ -1,4 +1,5 @@
 import argparse
+import json
 import os
 
 from mean import get_mean, get_std
@@ -196,6 +197,11 @@ def parse_opts():
         default=10,
         type=int,
         help='Trained model is saved at every this epochs.')
+    parser.add_argument(
+        '--keep_n_checkpoints',
+        default=5,
+        type=int,
+        help='Number of checkpoints to keep.')
     parser.add_argument(
         '--no_hflip',
         action='store_true',

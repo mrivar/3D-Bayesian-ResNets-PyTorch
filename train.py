@@ -96,3 +96,11 @@ def train_epoch(epoch, data_loader, model, criterion, optimizer, opt,
             'optimizer': optimizer.state_dict(),
         }
         torch.save(states, save_file_path)
+
+        # Delete old checkpoint
+        delete_file_path = os.path.join(opt.result_path,
+                            'save_{}.pth'.format(
+                                epoch - opt.checkpoint * opt.keep_n_checkpoints))
+
+        if os.path.isfile(delete_file_path):
+            os.remove(delete_file_path)
