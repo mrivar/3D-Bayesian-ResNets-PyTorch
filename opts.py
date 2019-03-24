@@ -112,8 +112,10 @@ def parse_opts():
     parser.add_argument(
         '--optimizer',
         default='sgd',
-        type=str,
-        help='Currently only support SGD')
+        const='sgd',
+        nargs='?',
+        choices=['sgd', 'adam', 'amsgrad'],
+        help='( sgd | adam | amsgrad |')
     parser.add_argument(
         '--lr_patience',
         default=10,
