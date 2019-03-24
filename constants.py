@@ -1,5 +1,5 @@
 from time import strftime
-from os.path import isdir
+import os
 
 ROOT_PATH = {'mnist': None,
              'infar': 'Data/InfAR_Dataset_1.0/',
@@ -34,6 +34,7 @@ BAYESIAN = {'resnet': False,
 
 def create_results_dir_name(args):
   counter = 0
+  RESULT_PATH = os.path.join(args.root_path, RESULT_PATH)
   while True:
     counter += 1
     name = RESULT_PATH%(
@@ -42,5 +43,5 @@ def create_results_dir_name(args):
       args.model_depth,
       strftime("%m_%d"),
       counter)
-    if not isdir(name): break
+    if not os.path.isdir(name): break
   return name
