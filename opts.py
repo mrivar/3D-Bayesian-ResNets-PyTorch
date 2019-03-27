@@ -12,7 +12,7 @@ def parse_opts():
         '--dataset',
         default='kinetics',
         type=str,
-        help='Used dataset (activitynet | kinetics | ucf101 | hmdb51)')
+        help='Used dataset (activitynet | kinetics | ucf101 | hmdb51 | jhmdb | ucfsports)')
     parser.add_argument(
         '--root_path',
         default='/root/data/ActivityNet',
