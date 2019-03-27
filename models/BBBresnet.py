@@ -93,6 +93,7 @@ class BBBBottleneck(nn.Module):
         self.stride = stride
 
     def forward(self, x):
+        kl = 0
         residual = x
 
         out, _kl = self.conv1(x)
