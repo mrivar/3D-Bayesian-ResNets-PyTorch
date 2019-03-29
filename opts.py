@@ -280,7 +280,7 @@ def parse_opts():
         if not os.path.isdir(args.checkpoints_path):
             os.makedirs(args.checkpoints_path)
         if args.resume_path:
-            args.resume_path = os.path.join(args.root_path, args.resume_path)
+            args.resume_path = os.path.join(args.checkpoints_path, args.resume_path)
         if args.pretrain_path:
             args.pretrain_path = os.path.join(args.root_path, args.pretrain_path)
     args.scales = [args.initial_scale]
