@@ -1,4 +1,5 @@
 import csv
+import os
 
 
 class AverageMeter(object):
@@ -23,10 +24,14 @@ class AverageMeter(object):
 class Logger(object):
 
     def __init__(self, path, header):
-        self.log_file = open(path, 'w')
+        write_header = True
+        if os.path.isdir(path):
+            write_header = False
+
+        self.log_file = open(path, 'a')
         self.logger = csv.writer(self.log_file, delimiter='\t')
 
-        self.logger.writerow(header)
+        if write_header: self.logger.writerow(header)
         self.header = header
 
     def __del(self):
