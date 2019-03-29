@@ -6,7 +6,7 @@ from datasets.hmdb51 import HMDB51
 
 def get_training_set(opt, spatial_transform, temporal_transform,
                      target_transform):
-    assert opt.dataset in ['kinetics', 'activitynet', 'ucf101', 'hmdb51']
+    assert opt.dataset in ['kinetics', 'activitynet', 'ucf101', 'hmdb51', 'jhmdb', 'ucfsports']
 
     if opt.dataset == 'kinetics':
         training_data = Kinetics(
@@ -25,7 +25,7 @@ def get_training_set(opt, spatial_transform, temporal_transform,
             spatial_transform=spatial_transform,
             temporal_transform=temporal_transform,
             target_transform=target_transform)
-    elif opt.dataset == 'ucf101':
+    elif opt.dataset == 'ucf101' or opt.dataset == 'ucfsports':
         training_data = UCF101(
             opt.video_path,
             opt.annotation_path,
@@ -33,7 +33,7 @@ def get_training_set(opt, spatial_transform, temporal_transform,
             spatial_transform=spatial_transform,
             temporal_transform=temporal_transform,
             target_transform=target_transform)
-    elif opt.dataset == 'hmdb51':
+    elif opt.dataset == 'hmdb51' or opt.dataset == 'jhmdb':
         training_data = HMDB51(
             opt.video_path,
             opt.annotation_path,
@@ -47,7 +47,7 @@ def get_training_set(opt, spatial_transform, temporal_transform,
 
 def get_validation_set(opt, spatial_transform, temporal_transform,
                        target_transform):
-    assert opt.dataset in ['kinetics', 'activitynet', 'ucf101', 'hmdb51']
+    assert opt.dataset in ['kinetics', 'activitynet', 'ucf101', 'hmdb51', 'jhmdb', 'ucfsports']
 
     if opt.dataset == 'kinetics':
         validation_data = Kinetics(
@@ -70,7 +70,7 @@ def get_validation_set(opt, spatial_transform, temporal_transform,
             temporal_transform,
             target_transform,
             sample_duration=opt.sample_duration)
-    elif opt.dataset == 'ucf101':
+    elif opt.dataset == 'ucf101' or opt.dataset == 'ucfsports':
         validation_data = UCF101(
             opt.video_path,
             opt.annotation_path,
@@ -80,7 +80,7 @@ def get_validation_set(opt, spatial_transform, temporal_transform,
             temporal_transform,
             target_transform,
             sample_duration=opt.sample_duration)
-    elif opt.dataset == 'hmdb51':
+    elif opt.dataset == 'hmdb51' or opt.dataset == 'jhmdb':
         validation_data = HMDB51(
             opt.video_path,
             opt.annotation_path,
