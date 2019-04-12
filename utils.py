@@ -25,7 +25,7 @@ class Logger(object):
 
     def __init__(self, path, header):
         write_header = True
-        if os.path.isdir(path):
+        if os.path.isfile(path):
             write_header = False
 
         self.log_file = open(path, 'a')

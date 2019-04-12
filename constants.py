@@ -2,34 +2,39 @@ from time import strftime
 import os
 
 ROOT_PATH = {'mnist': None,
-             'infar': 'Data/InfAR_Dataset_1.0/',
              'hmdb51': 'Data/HMDB51/',
-             'ucf101': 'Data/UCF101/',
+             'infar': 'Data/InfAR_Dataset_1.0/',
              'jhmdb': 'Data/JHMDB/',
+             'ucf101': 'Data/UCF101/',
+             'ucf11': 'Data/UCF11/',
              'ucfsports': 'Data/ucf_sports/'}
 
 VIDEO_PATH = {'mnist': None,
-             'infar': 'Data/InfAR_Dataset_1.0/',
              'hmdb51': 'hmdb51_jpg/',
-             'ucf101': '',
+             'infar': 'Data/InfAR_Dataset_1.0/',
              'jhmdb': 'JHMDB_jpg/',
+             'ucf101': '',
+             'ucf11': 'jpg/',
              'ucfsports': 'jpg/'}
 
 
 ANNOTATION_PATH = {'mnist': None,
-                  'infar': None,
                   'hmdb51': 'hmdb51_%d.json',
+                  'infar': None,
+                  'jhmdb': 'jhmdb_%d.json',
                   'ucf101': None,
-                  'jhmdb': 'hmdb51_%d.json',
-                  'ucfsports': None}
+                  'ucf11': 'ucf11_%d.json',
+                  'ucfsports': 'ucfsports_%d.json',
+                  'ucf11': None}
 
 RESULT_PATH = 'results/%s_%s%d_%s__%d/'
 
 NUM_CLASSES = {'mnist': 10,
-               'infar': 12,
                'hmdb51': 51,
-               'ucf101': 101,
+               'infar': 12,
                'jhmdb': 21,
+               'ucf101': 101,
+               'ucf11': 11,
                'ucfsports': 10,
                'activitynet': 200,
                'kinetics': 400}
