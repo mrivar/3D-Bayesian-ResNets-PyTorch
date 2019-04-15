@@ -94,6 +94,7 @@ if __name__ == '__main__':
                 amsgrad=(opt.optimizer=='amsgrad'))
         scheduler = lr_scheduler.ReduceLROnPlateau(
             optimizer, 'min', patience=opt.lr_patience)
+        del training_data, target_transform, temporal_transform, spatial_transform, parameters, crop_method
     if not opt.no_val:
         spatial_transform = Compose([
             Scale(opt.sample_size),
@@ -112,6 +113,7 @@ if __name__ == '__main__':
             pin_memory=True)
         val_logger = Logger(
             os.path.join(opt.result_path, 'val.log'), ['epoch', 'loss', 'acc'])
+        del validation_data, target_transform, temporal_transform, spatial_transform
 
     if opt.resume_path:
         print('loading checkpoint {}'.format(opt.resume_path))
@@ -122,6 +124,7 @@ if __name__ == '__main__':
         model.load_state_dict(checkpoint['state_dict'])
         if not opt.no_train:
             optimizer.load_state_dict(checkpoint['optimizer'])
+        del checkpoint
 
     print('run')
     for i in range(opt.begin_epoch, opt.n_epochs + 1):
