@@ -44,7 +44,7 @@ class BBBBasicBlock(nn.Module):
         super(BBBBasicBlock, self).__init__()
         self.conv1 = BBBconv3x3x3(inplanes, planes, stride)
         self.bn1 = nn.BatchNorm3d(planes)
-        self.soft = nn.Softplus()
+        self.soft = nn.ReLU()
         self.conv2 = BBBconv3x3x3(planes, planes)
         self.bn2 = nn.BatchNorm3d(planes)
         self.downsample = downsample
@@ -88,7 +88,7 @@ class BBBBottleneck(nn.Module):
         self.bn2 = nn.BatchNorm3d(planes)
         self.conv3 = BBBConv3d(planes, planes * 4, kernel_size=1)
         self.bn3 = nn.BatchNorm3d(planes * 4)
-        self.soft = nn.Softplus()
+        self.soft = nn.ReLU()
         self.downsample = downsample
         self.stride = stride
 
@@ -141,7 +141,7 @@ class BBBResNet(nn.Module):
             stride=(1, 2, 2),
             padding=(3, 3, 3))
         self.bn1 = nn.BatchNorm3d(64)
-        self.soft = nn.Softplus()
+        self.soft = nn.ReLU()
         self.maxpool = nn.MaxPool3d(kernel_size=(3, 3, 3), stride=2, padding=1)
         self.layer1 = self._make_layer(block, 64, layers[0], shortcut_type)
         self.layer2 = self._make_layer(

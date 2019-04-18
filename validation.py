@@ -47,7 +47,7 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger):
         else:
             outputs = model(inputs)
             loss = criterion(outputs, targets)
-        acc, res = calculate_test_accuracy(softmax(outputs), targets)
+        acc, res = calculate_test_accuracy(softmax(outputs, dim=1), targets)
 
         try: losses.update(loss.data[0], inputs.size(0))
         except: losses.update(loss.data.item(), inputs.size(0))
