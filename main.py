@@ -112,7 +112,7 @@ if __name__ == '__main__':
             num_workers=opt.n_threads,
             pin_memory=True)
         val_logger = Logger(
-            os.path.join(opt.result_path, 'val.log'), ['epoch', 'loss', 'acc'])
+            os.path.join(opt.result_path, 'val.log'), ['epoch', 'loss', 'acc', 'epistemic', 'aleatoric'])
         del validation_data, target_transform, temporal_transform, spatial_transform
 
     if opt.resume_path:

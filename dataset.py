@@ -122,7 +122,7 @@ def get_test_set(opt, spatial_transform, temporal_transform, target_transform):
             temporal_transform,
             target_transform,
             sample_duration=opt.sample_duration)
-    elif opt.dataset == 'ucf101':
+    elif opt.dataset == 'ucf101' or opt.dataset == 'ucfsports':
         test_data = UCF101(
             opt.video_path,
             opt.annotation_path,
@@ -132,7 +132,7 @@ def get_test_set(opt, spatial_transform, temporal_transform, target_transform):
             temporal_transform,
             target_transform,
             sample_duration=opt.sample_duration)
-    elif opt.dataset == 'hmdb51':
+    elif opt.dataset == 'hmdb51' or opt.dataset == 'jhmdb':
         test_data = HMDB51(
             opt.video_path,
             opt.annotation_path,

@@ -1,10 +1,12 @@
 import torch
 from torch.autograd import Variable
+from torch.nn.functional import softmax
+import numpy as np
 import time
 import sys
 import math
 
-from utils import AverageMeter, calculate_accuracy
+from utils import AverageMeter, calculate_test_accuracy
 
 
 def val_epoch(epoch, data_loader, model, criterion, opt, logger):
@@ -16,6 +18,7 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger):
     data_time = AverageMeter()
     losses = AverageMeter()
     accuracies = AverageMeter()
+    conf = []
     m = math.ceil(len(data_loader) / opt.batch_size)
 
     end_time = time.time()
@@ -44,11 +47,13 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger):
         else:
             outputs = model(inputs)
             loss = criterion(outputs, targets)
-        acc = calculate_accuracy(outputs, targets)
+        acc, res = calculate_test_accuracy(softmax(outputs), targets)
 
         try: losses.update(loss.data[0], inputs.size(0))
         except: losses.update(loss.data.item(), inputs.size(0))
         accuracies.update(acc, inputs.size(0))
+
+        conf.append(res)
 
         batch_time.update(time.time() - end_time)
         end_time = time.time()
@@ -66,6 +71,11 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger):
                   loss=losses,
                   acc=accuracies))
 
-    logger.log({'epoch': epoch, 'loss': losses.avg, 'acc': accuracies.avg})
+    # Calculate aleatoric and epistemic uncertainty
+    p_hat = np.array(conf)
+    epistemic = np.mean(p_hat ** 2, axis=0) - np.mean(p_hat, axis=0) ** 2
+    aleatoric = np.mean(p_hat * (1 - p_hat), axis=0)
+
+    logger.log({'epoch': epoch, 'loss': losses.avg, 'acc': accuracies.avg, 'epistemic': epistemic, 'aleatoric': aleatoric})
 
     return losses.avg
