@@ -76,6 +76,18 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger):
     epistemic = np.mean(p_hat ** 2, axis=0) - np.mean(p_hat, axis=0) ** 2
     aleatoric = np.mean(p_hat * (1 - p_hat), axis=0)
 
-    logger.log({'epoch': epoch, 'loss': losses.avg, 'acc': accuracies.avg, 'epistemic': epistemic, 'aleatoric': aleatoric})
+    # Get random parameters mean and deviation
+    random_param_mean   = 0
+    random_param_logvar = 0
+    for k,v in model.named_parameters():
+      if k == "module.layer1.1.conv1.qw_mean":
+        random_param_mean = v[0][0][0][0][0].item()
+      if k == "module.layer1.1.conv1.qw_logvar":
+        random_param_logvar = v[0][0][0][0][0].item()
+
+
+    logger.log({'epoch': epoch, 'loss': losses.avg, 'acc': accuracies.avg,
+      'epistemic': epistemic, 'aleatoric': aleatoric,
+      'random_param_mean': random_param_mean, 'random_param_logvar': random_param_logvar})
 
     return losses.avg
