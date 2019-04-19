@@ -113,7 +113,8 @@ if __name__ == '__main__':
             pin_memory=True)
         val_logger = Logger(
             os.path.join(opt.result_path, 'val.log'), ['epoch', 'loss', 'acc',
-            'epistemic', 'aleatoric', 'random_param_mean', 'random_param_logvar'])
+            'epistemic', 'aleatoric', 'random_param_mean', 'random_param_logvar',
+            'total_param_mean', 'total_param_logvar'])
         del validation_data, target_transform, temporal_transform, spatial_transform
 
     if opt.resume_path:

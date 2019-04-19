@@ -49,8 +49,7 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger):
             loss = criterion(outputs, targets)
         acc, res = calculate_test_accuracy(softmax(outputs, dim=1), targets)
 
-        try: losses.update(loss.data[0], inputs.size(0))
-        except: losses.update(loss.data.item(), inputs.size(0))
+        losses.update(loss.data.item(), inputs.size(0))
         accuracies.update(acc, inputs.size(0))
 
         conf.append(res)
@@ -79,15 +78,20 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger):
     # Get random parameters mean and deviation
     random_param_mean   = 0
     random_param_logvar = 0
+    total_param_mean    = 0
+    total_param_logvar  = 0
     for k,v in model.named_parameters():
       if k == "module.layer1.1.conv1.qw_mean":
         random_param_mean = v[0][0][0][0][0].item()
+        total_param_mean = v.mean().item()
       if k == "module.layer1.1.conv1.qw_logvar":
         random_param_logvar = v[0][0][0][0][0].item()
+        total_param_logvar = v.mean().item()
 
 
     logger.log({'epoch': epoch, 'loss': losses.avg, 'acc': accuracies.avg,
       'epistemic': epistemic, 'aleatoric': aleatoric,
-      'random_param_mean': random_param_mean, 'random_param_logvar': random_param_logvar})
+      'random_param_mean': random_param_mean, 'random_param_logvar': random_param_logvar,
+      'total_param_mean': total_param_mean, 'total_param_logvar': total_param_logvar})
 
     return losses.avg

@@ -60,8 +60,7 @@ def calculate_accuracy(outputs, targets):
     _, pred = outputs.topk(1, 1, True)
     pred = pred.t()
     correct = pred.eq(targets.view(1, -1))
-    try: n_correct_elems = correct.float().sum().data[0]
-    except: n_correct_elems = correct.float().sum().data.item()
+    n_correct_elems = correct.float().sum().data.item()
 
     return n_correct_elems / batch_size
 
@@ -71,7 +70,6 @@ def calculate_test_accuracy(outputs, targets):
     results, pred = outputs.topk(1, 1, True)
     pred = pred.t()
     correct = pred.eq(targets.view(1, -1))
-    try: n_correct_elems = correct.float().sum().data[0]
-    except: n_correct_elems = correct.float().sum().data.item()
+    n_correct_elems = correct.float().sum().data.item()
 
     return n_correct_elems / batch_size, results[0].item()
