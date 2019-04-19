@@ -51,7 +51,7 @@ class _ConvNd(nn.Module):
 
         # approximate posterior weights...
         self.qw_mean = Parameter(torch.Tensor(out_channels, in_channels // groups, *kernel_size))
-        self.qw_logvar = Parameter(torch.Tensor(out_channels, in_channels // groups, *kernel_size))
+        # self.qw_logvar = Parameter(torch.Tensor(out_channels, in_channels // groups, *kernel_size))
 
         # optionally add bias
         # self.qb_mean = Parameter(torch.Tensor(out_channels))
@@ -62,7 +62,7 @@ class _ConvNd(nn.Module):
         self.conv_qw_std = Parameter(torch.Tensor(out_channels, in_channels // groups, *kernel_size))
 
         # ...as normal distributions
-        self.qw = Normal(mu=self.qw_mean, logvar=self.qw_logvar)
+        # self.qw = Normal(mu=self.qw_mean, logvar=self.qw_logvar)
         # self.qb = Normal(mu=self.qb_mean, logvar=self.qb_logvar)
 
         self.conv_qw = Normalout(mu=self.conv_qw_mean, std=self.conv_qw_std)
@@ -85,7 +85,7 @@ class _ConvNd(nn.Module):
             n *= k
         stdv = 1. / math.sqrt(n)
         self.qw_mean.data.uniform_(-stdv, stdv)
-        self.qw_logvar.data.uniform_(-stdv, stdv).add_(self.q_logvar_init)
+        # self.qw_logvar.data.uniform_(-stdv, stdv).add_(self.q_logvar_init)
 
         # self.qb_mean.data.uniform_(-stdv, stdv)
         # self.qb_logvar.data.uniform_(-stdv, stdv).add_(self.q_logvar_init)
@@ -230,7 +230,7 @@ class BBBLinearFactorial(nn.Module):
 
         # Approximate posterior weights...
         self.qw_mean = Parameter(torch.Tensor(out_features, in_features))
-        self.qw_logvar = Parameter(torch.Tensor(out_features, in_features))
+        # self.qw_logvar = Parameter(torch.Tensor(out_features, in_features))
 
         # optionally add bias
         # self.qb_mean = Parameter(torch.Tensor(out_features))
@@ -241,7 +241,7 @@ class BBBLinearFactorial(nn.Module):
         self.fc_qw_std = Parameter(torch.Tensor(out_features, in_features))
 
         # ...as normal distributions
-        self.qw = Normal(mu=self.qw_mean, logvar=self.qw_logvar)
+        # self.qw = Normal(mu=self.qw_mean, logvar=self.qw_logvar)
         # self.qb = Normal(mu=self.qb_mean, logvar=self.qb_logvar)
         self.fc_qw = Normalout(mu=self.fc_qw_mean, std=self.fc_qw_std)
 
@@ -259,7 +259,7 @@ class BBBLinearFactorial(nn.Module):
         # initialize (trainable) approximate posterior parameters
         stdv = 10. / math.sqrt(self.in_features)
         self.qw_mean.data.uniform_(-stdv, stdv)
-        self.qw_logvar.data.uniform_(-stdv, stdv).add_(self.q_logvar_init)
+        # self.qw_logvar.data.uniform_(-stdv, stdv).add_(self.q_logvar_init)
         # self.qb_mean.data.uniform_(-stdv, stdv)
         # self.qb_logvar.data.uniform_(-stdv, stdv).add_(self.q_logvar_init)
         self.fc_qw_mean.data.uniform_(-stdv, stdv)
