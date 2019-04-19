@@ -77,21 +77,21 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger):
 
     # Get random parameters mean and deviation
     random_param_mean   = 0
-    random_param_logvar = 0
+    random_param_log_alpha = 0
     total_param_mean    = 0
-    total_param_logvar  = 0
+    total_param_log_alpha  = 0
     for k,v in model.named_parameters():
       if k == "module.layer1.1.conv1.qw_mean":
         random_param_mean = v[0][0][0][0][0].item()
         total_param_mean = v.mean().item()
-      if k == "module.layer1.1.conv1.qw_logvar":
-        random_param_logvar = v[0][0][0][0][0].item()
-        total_param_logvar = v.mean().item()
+      if k == "module.layer1.1.conv1.log_alpha":
+        random_param_log_alpha = v.item()
+        total_param_log_alpha = v.item()
 
 
     logger.log({'epoch': epoch, 'loss': losses.avg, 'acc': accuracies.avg,
       'epistemic': epistemic, 'aleatoric': aleatoric,
-      'random_param_mean': random_param_mean, 'random_param_logvar': random_param_logvar,
-      'total_param_mean': total_param_mean, 'total_param_logvar': total_param_logvar})
+      'random_param_mean': random_param_mean, 'random_param_log_alpha': random_param_log_alpha,
+      'total_param_mean': total_param_mean, 'total_param_log_alpha': total_param_log_alpha})
 
     return losses.avg
