@@ -1,83 +1,43 @@
-import pandas as pd
 import matplotlib.pyplot as plt
 
-ds = ["hmdb51", "jhmdb", "ucfsports", "ucf11"]
-sma = 20
-dataset = 1
+from plot import *
+from plot_utils import *
 
-##########################################################
-# TRAIN ##################################################
-# LOAD TRAIN FILES
-model   = "resnet34"
-date    = "03_30__1"
-sets    = "train"
-
-path = "%s_%s_%s/%s.log"%(ds[dataset], model, date, sets)
-with open(path, 'r') as f:
-    frequentist = pd.read_csv(f, sep="\t")
-
-
-dataset = 1
-model   = "BBBresnet34"
-date    = "03_29__1"
-sets    = "train"
-
-path = "%s_%s_%s/%s.log"%(ds[dataset], model, date, sets)
-with open(path, 'r') as f:
-    bayesian = pd.read_csv(f, sep="\t")
-
-
-
-# PLOTTING
-plt.plot(frequentist.epoch, frequentist.acc)
-plt.plot(bayesian.epoch, bayesian.acc)
-plt.show()
-
-
-
-
-
-
-##########################################################
-# VALIDATION #############################################
-sets = "val"
+ds = ["hmdb51", "jhmdb", "ucfsports", "ucf11", "infar"]
 sma = 4
-
+dataset = ds[1]
 model   = "resnet34"
-date    = "03_30__1"
-path = "%s_%s_%s/%s.log"%(ds[dataset], model, date, sets)
-with open(path, 'r') as f:
-    frequentist_val = pd.read_csv(f, sep="\t")
+date    = "03_30"
+counter = 1
+sets    = "train"
 
-model   = "BBBresnet34"
-date    = "03_29__1"
-path = "%s_%s_%s/%s.log"%(ds[dataset], model, date, sets)
-with open(path, 'r') as f:
-    bayesian_val = pd.read_csv(f, sep="\t")
+##########################################################
+# TRAIN OR VALIDATION ####################################
+plot_bayes_vs_freq(dataset, model, date, counter, sets)
 
 
-# SMOOTHING USING SIMPLE MOVING AVERAGE
-frq_ders = [0] * (sma + 1)
-for i in range(1 + sma, len(frequentist_val)):
-    derivative = sum(frequentist_val.acc[i-sma:i]) / sma
-    frq_ders.append(derivative)
-
-bay_ders = [0] * (sma + 1)
-for i in range(1 + sma, len(bayesian_val)):
-    derivative = sum(bayesian_val.acc[i-sma:i]) / sma
-    bay_ders.append(derivative)
-
-# PLOTTING
-plt.plot(frequentist_val.epoch, frq_ders)
-plt.plot(bayesian_val.epoch, bay_ders)
+## or
+csv = [load_csv(complete_name(dataset, model, "03_30", counter, sets)),
+       load_csv(complete_name(dataset, "BBB"+model, "03_29", counter, sets))]
+plot_against(csv, 'acc', ['Frequentist', 'Bayesian'])
+plt.legend()
 plt.show()
 
 
-# PLOTTING WITHOUT SMOOTHING
-plt.plot(frequentist_val.epoch, frequentist_val.acc)
-plt.plot(bayesian_val.epoch, bayesian_val.acc)
-plt.show()
 
+
+
+##########################################################
+# TRAIN VS VALID #########################################
+plot_total_train_vs_validation(dataset=ds[2], model="BBBresnet34", sma=3)
+
+
+
+
+
+##########################################################
+# BAYESIAN VS FREQUENTIST ################################
+plot_total_bayes_vs_freq(dataset=ds[2], model="BBBresnet34", sma=3)
 
 
 
@@ -85,19 +45,20 @@ plt.show()
 
 ##########################################################
 # UNCERTAINTY ############################################
-plt.plot(bayesian_val.epoch, bayesian_val.random_param_logvar)
-plt.show()
+plot_standard_dev(bayesian_val.random_param_mean, bayesian_val.random_param_log_alpha)
 
-import seaborn as sns
-import numpy as np
-epochs= [0,19,49,99,499]
-colors= ["#bfd6f6", "#8dbdff", "#64a1f4", "#4a91f2", "#3b7dd8"]
-means = bayesian_val.random_param_mean[epochs]
-stds  = bayesian_val.random_param_logvar[epochs]
+plot_weights(bayesian_val.random_param_mean, bayesian_val.random_param_log_alpha)
 
-for i, e in enumerate(epochs):
-    distribution = np.random.normal(loc=means[i], scale=stds[i], size=500000)
-    sns.distplot(distribution, hist=False, label="%s"%str(e+1), color=colors[i])
+
+
+
+
+##########################################################
+# MEAN UNCERTAINTY #######################################
+plot_standard_dev(bayesian_val.total_param_mean, bayesian_val.total_param_log_alpha)
+
+plot_weights(bayesian_val.total_param_mean, bayesian_val.total_param_log_alpha)
+
 
 """
 x = np.random.normal(loc=0, scale=3, size=500000)
@@ -113,21 +74,3 @@ sns.distplot(u, hist=False, label="5", color="#bfd6f6")
 plt.xlim([15,-15])
 plt.show()
 """
-
-
-
-##########################################################
-# MEAN UNCERTAINTY #######################################
-plt.plot(bayesian_val.epoch, bayesian_val.total_param_logvar)
-plt.show()
-
-import seaborn as sns
-import numpy as np
-epochs= [0,19,49,99,499]
-colors= ["#bfd6f6", "#8dbdff", "#64a1f4", "#4a91f2", "#3b7dd8"]
-means = bayesian_val.total_param_mean[epochs]
-stds  = bayesian_val.total_param_logvar[epochs]
-
-for i, e in enumerate(epochs):
-    distribution = np.random.normal(loc=means[i], scale=stds[i], size=500000)
-    sns.distplot(distribution, hist=False, label="%s"%str(e+1), color=colors[i])
