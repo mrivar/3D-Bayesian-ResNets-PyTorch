@@ -17,6 +17,7 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger):
     batch_time = AverageMeter()
     data_time = AverageMeter()
     losses = AverageMeter()
+    losses_logpy = AverageMeter()
     accuracies = AverageMeter()
     conf = []
     m = math.ceil(len(data_loader) / opt.batch_size)
@@ -44,6 +45,8 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger):
             # Forward Propagation (with KL calc.)
             outputs, kl = model(inputs)
             loss = criterion(outputs, targets, kl, beta)
+            logpy = criterion.loss(outputs, targets)
+            losses_logpy.update(logpy.data.item(), inputs.size(0))
         else:
             outputs = model(inputs)
             loss = criterion(outputs, targets)
@@ -94,4 +97,6 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger):
       'random_param_mean': random_param_mean, 'random_param_log_alpha': random_param_log_alpha,
       'total_param_mean': total_param_mean, 'total_param_log_alpha': total_param_log_alpha})
 
+    if opt.bayesian:
+      return losses_logpy.avg
     return losses.avg
