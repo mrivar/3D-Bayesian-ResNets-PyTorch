@@ -3,6 +3,8 @@ import os
 import seaborn as sns
 import numpy as np
 
+from plot_utils import *
+
 def plot_train_vs_validation(dataset, model, date, counter):
     sets = ['train', 'val']
     csv = [load_csv(complete_name(dataset, model, date, counter, s))
@@ -62,6 +64,12 @@ def plot_total_bayes_vs_freq(dataset, model, sma=1):
     plt.plot(range(len(bayes)), bayes, label="Bayesian")
     plt.title(title)
     plt.legend()
+    plt.show()
+
+
+def plot_alpha(mean, log_alpha):
+    alphas = np.exp(log_alpha)
+    plt.plot(range(1, len(mean)), alphas)
     plt.show()
 
 

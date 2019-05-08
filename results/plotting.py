@@ -47,6 +47,8 @@ plot_total_bayes_vs_freq(dataset=ds[2], model="BBBresnet34", sma=3)
 # UNCERTAINTY ############################################
 plot_standard_dev(bayesian_val.random_param_mean, bayesian_val.random_param_log_alpha)
 
+plot_alpha(bayesian_val.random_param_mean, bayesian_val.random_param_log_alpha)
+
 plot_weights(bayesian_val.random_param_mean, bayesian_val.random_param_log_alpha)
 
 
@@ -56,6 +58,8 @@ plot_weights(bayesian_val.random_param_mean, bayesian_val.random_param_log_alpha
 ##########################################################
 # MEAN UNCERTAINTY #######################################
 plot_standard_dev(bayesian_val.total_param_mean, bayesian_val.total_param_log_alpha)
+
+plot_alpha(bayesian_val.total_param_mean, bayesian_val.total_param_log_alpha)
 
 plot_weights(bayesian_val.total_param_mean, bayesian_val.total_param_log_alpha)
 
