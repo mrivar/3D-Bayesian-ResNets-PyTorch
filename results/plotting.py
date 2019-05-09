@@ -5,11 +5,11 @@ from plot_utils import *
 
 ds = ["hmdb51", "jhmdb", "ucfsports", "ucf11", "infar"]
 sma = 4
-dataset = ds[1]
+dataset = ds[2]
 model   = "resnet34"
-date    = "03_30"
+date    = "04_19"
 counter = 1
-sets    = "train"
+sets    = "val"
 
 ##########################################################
 # TRAIN OR VALIDATION ####################################
@@ -43,13 +43,16 @@ plot_total_bayes_vs_freq(dataset=ds[2], model="BBBresnet34", sma=3)
 
 
 
+
+csv = load_csv(complete_name(dataset, "BBB"+model, date, counter, sets))
+
 ##########################################################
 # UNCERTAINTY ############################################
-plot_standard_dev(bayesian_val.random_param_mean, bayesian_val.random_param_log_alpha)
+plot_standard_dev(csv.random_param_mean, csv.random_param_log_alpha)
 
-plot_alpha(bayesian_val.random_param_mean, bayesian_val.random_param_log_alpha)
+plot_alpha(csv.random_param_mean, csv.random_param_log_alpha)
 
-plot_weights(bayesian_val.random_param_mean, bayesian_val.random_param_log_alpha)
+plot_weights(csv.random_param_mean, csv.random_param_log_alpha)
 
 
 
@@ -57,11 +60,11 @@ plot_weights(bayesian_val.random_param_mean, bayesian_val.random_param_log_alpha
 
 ##########################################################
 # MEAN UNCERTAINTY #######################################
-plot_standard_dev(bayesian_val.total_param_mean, bayesian_val.total_param_log_alpha)
+plot_standard_dev(csv.total_param_mean, csv.total_param_log_alpha)
 
-plot_alpha(bayesian_val.total_param_mean, bayesian_val.total_param_log_alpha)
+plot_alpha(csv.total_param_mean, csv.total_param_log_alpha)
 
-plot_weights(bayesian_val.total_param_mean, bayesian_val.total_param_log_alpha)
+plot_weights(csv.total_param_mean, csv.total_param_log_alpha)
 
 
 """

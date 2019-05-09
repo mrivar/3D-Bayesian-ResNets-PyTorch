@@ -10,7 +10,7 @@ def complete_name(dataset, model, date, counter, sets):
     return "%s_%s_%s__%d/%s.log"%(dataset, model, date, counter, sets)
 
 
-def apply_sma(original, sma=1)
+def apply_sma(original, sma=1):
     ders = [0] * (sma + 1)
     for i in range(1 + sma, len(original)):
         derivative = sum(original[i-sma:i]) / sma

@@ -69,13 +69,13 @@ def plot_total_bayes_vs_freq(dataset, model, sma=1):
 
 def plot_alpha(mean, log_alpha):
     alphas = np.exp(log_alpha)
-    plt.plot(range(1, len(mean)), alphas)
+    plt.plot(range(1, len(mean)+1), alphas)
     plt.show()
 
 
 def plot_standard_dev(mean, log_alpha):
-    stds = pow(mean, 2) * np.exp(log_alpha)
-    plt.plot(range(1, len(mean)), stds)
+    stds = np.sqrt(pow(mean, 2) * np.exp(log_alpha))
+    plt.plot(range(1, len(mean)+1), stds)
     plt.show()
 
 
