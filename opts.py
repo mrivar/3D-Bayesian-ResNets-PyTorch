@@ -245,6 +245,13 @@ def parse_opts():
         default=1,
         type=int,
         help='Split. Dataset: ( HMDB51 )')
+    #parser.add_argument(
+    #    '--cross_validation', action='store_true', help='Set true to test using cross validation')
+    #parser.add_argument(
+    #    '--cross_validation_type',
+    #    default='loo',
+    #    type=str,
+    #    help='Type of Cross Validation: ( loo ')#| 5fold | 10fold )')
     # Bayesian options
     parser.add_argument(
         '--bayesian',
@@ -254,6 +261,10 @@ def parse_opts():
         default="Blundell",
         type=str,
         help='Beta type ( Bloendell | Soenderby | Standard | ')
+    #parser.add_argument('--q_std_init',
+    #    #default=5,
+    #    type=float,
+    #    help='Posterior Standard Deviation initial value => logvar is calculated automatically (log(std**2))')
 
     args = parser.parse_args()
 
