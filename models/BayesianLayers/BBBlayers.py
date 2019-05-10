@@ -93,10 +93,15 @@ class _ConvNd(nn.Module):
         self.conv_qw_mean.data.uniform_(-stdv, stdv)
         self.conv_qw_std.data.uniform_(-stdv, stdv).add_(self.q_logvar_init)
         self.log_alpha.data.uniform_(-stdv, stdv)
+        self.qw_var = 25
 
     @property
-    def qw_std(self):
+    def qw_var(self):
         return torch.exp(self.log_alpha)*self.qw_mean.pow(2)
+
+    @qw_var.setter
+    def qw_var(self, logvar):
+        self.log_alpha.data = math.exp(logvar)/self.qw_mean.mean().pow(2)
 
     def extra_repr(self):
         s = ('{in_channels}, {out_channels}, kernel_size={kernel_size}'
@@ -138,7 +143,7 @@ class BBBConv2d(_ConvNd):
         # local reparameterization trick for convolutional layer
         conv_qw_mean = F.conv2d(input=input, weight=self.qw_mean, stride=self.stride, padding=self.padding,
                                 dilation=self.dilation, groups=self.groups)
-        conv_qw_std = torch.sqrt(1e-8 + F.conv2d(input=input.pow(2), weight=self.qw_std,
+        conv_qw_std = torch.sqrt(1e-8 + F.conv2d(input=input.pow(2), weight=self.qw_var,
                                                  stride=self.stride, padding=self.padding, dilation=self.dilation, groups=self.groups))
 
         if cuda:
@@ -188,7 +193,7 @@ class BBBConv3d(_ConvNd):
         # local reparameterization trick for convolutional layer
         conv_qw_mean = F.conv3d(input=input, weight=self.qw_mean, stride=self.stride, padding=self.padding,
                                 dilation=self.dilation, groups=self.groups)
-        conv_qw_std = torch.sqrt(1e-8 + F.conv3d(input=input.pow(2), weight=self.qw_std,
+        conv_qw_std = torch.sqrt(1e-8 + F.conv3d(input=input.pow(2), weight=self.qw_var,
                                                  stride=self.stride, padding=self.padding, dilation=self.dilation, groups=self.groups))
 
         if cuda:
@@ -271,7 +276,7 @@ class BBBLinearFactorial(nn.Module):
         self.log_alpha.data.uniform_(-stdv, stdv)
 
     @property
-    def qw_std(self):
+    def qw_var(self):
         return torch.exp(self.log_alpha)*self.qw_mean.pow(2)
 
     def forward(self, input):
@@ -285,7 +290,7 @@ class BBBLinearFactorial(nn.Module):
         """
 
         fc_qw_mean = F.linear(input=input, weight=self.qw_mean)
-        fc_qw_si = torch.sqrt(1e-8 + F.linear(input=input.pow(2), weight=self.qw_std))
+        fc_qw_si = torch.sqrt(1e-8 + F.linear(input=input.pow(2), weight=self.qw_var))
 
         if cuda:
             fc_qw_mean.cuda()
