@@ -39,6 +39,12 @@ def plot_total_train_vs_validation(dataset, model, sma=1):
     plt.plot(range(len(train)), train, label="Training")
     plt.plot(range(len(valid)), valid, label="Validation")
     plt.title(title)
+    plt.ylabel("Accuracy")
+    plt.ylim(0,1.0001)
+    plt.yticks(np.arange(0.,1.0001,0.1))
+    plt.xlabel("Epochs")
+    plt.xlim(0, 500)
+    plt.grid(color="#f1f1f4")
     plt.legend()
     plt.show()
 
@@ -46,9 +52,9 @@ def plot_total_train_vs_validation(dataset, model, sma=1):
 def plot_total_bayes_vs_freq(dataset, model, sma=1):
     title = "%s_%s vs %s_%s"%(dataset, model, dataset, "BBB"+model)
     f_models = [x for x in os.listdir()
-                if os.path.isdir(x) and "%s_%s"%(ds[dataset], model) in x]
+                if os.path.isdir(x) and "%s_%s"%(dataset, model) in x]
     b_models = [x for x in os.listdir()
-                if os.path.isdir(x) and "%s_%s"%(ds[dataset], "BBB"+model) in x]
+                if os.path.isdir(x) and "%s_%s"%(dataset, "BBB"+model) in x]
     freqs = []
     bayes = []
     for m in f_models:
@@ -63,6 +69,12 @@ def plot_total_bayes_vs_freq(dataset, model, sma=1):
     plt.plot(range(len(freqs)), freqs, label="Frequentist")
     plt.plot(range(len(bayes)), bayes, label="Bayesian")
     plt.title(title)
+    plt.ylabel("Accuracy")
+    plt.ylim(0,1.0001)
+    plt.yticks(np.arange(0.,1.0001,0.1))
+    plt.xlabel("Epochs")
+    plt.xlim(0, 500)
+    plt.grid(color="#f1f1f4")
     plt.legend()
     plt.show()
 

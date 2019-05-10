@@ -37,7 +37,7 @@ plot_total_train_vs_validation(dataset=ds[2], model="BBBresnet34", sma=3)
 
 ##########################################################
 # BAYESIAN VS FREQUENTIST ################################
-plot_total_bayes_vs_freq(dataset=ds[2], model="BBBresnet34", sma=3)
+plot_total_bayes_vs_freq(dataset=ds[2], model="resnet34", sma=3)
 
 
 
