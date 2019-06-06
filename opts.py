@@ -111,8 +111,8 @@ def parse_opts():
     parser.set_defaults(nesterov=False)
     parser.add_argument(
         '--optimizer',
-        default='sgd',
-        const='sgd',
+        default='adam',
+        const='adam',
         nargs='?',
         choices=['sgd', 'adam', 'amsgrad'],
         help='( sgd | adam | amsgrad |')
@@ -260,6 +260,8 @@ def parse_opts():
     parser.add_argument('--kl_calc', action='store_true', help='Calculate KL')
     parser.add_argument('--bias', action='store_true', help='Include bias')
     parser.add_argument('--q_logvar_init', default=-5, type=int, help='q_logvar_init')
+    parser.add_argument('--num_samples', default=10, type=int, help='Number of samples')
+    parser.add_argument('--scaleVideo', action='store_true', help='Scale videos to small size as preprocessing')
     parser.add_argument('--beta_type',
         default="Blundell",
         type=str,
@@ -282,6 +284,7 @@ def parse_opts():
     args.result_path = args.result_path or create_results_dir_name(args)
     args.n_classes = NUM_CLASSES[args.dataset]
     args.bayesian = BAYESIAN[args.model]
+    if not args.bayesian: args.num_samples = 1
 
 
     # Build opts

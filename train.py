@@ -76,7 +76,8 @@ def train_epoch(epoch, data_loader, model, criterion, optimizer, opt,
                   batch_time=batch_time,
                   data_time=data_time,
                   loss=losses,
-                  acc=accuracies))
+                  acc=accuracies), end="\r")
+    print()
 
     epoch_logger.log({
         'epoch': epoch,

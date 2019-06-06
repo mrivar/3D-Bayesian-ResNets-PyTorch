@@ -112,7 +112,9 @@ if __name__ == '__main__':
             num_workers=opt.n_threads,
             pin_memory=True)
         val_logger = Logger(
-            os.path.join(opt.result_path, 'val.log'), ['epoch', 'loss', 'acc',
+            os.path.join(opt.result_path, 'val.log'), ['epoch', 'loss', 'acc', 'acc_mean', 'acc_vote'])
+        uncertainty_logger = Logger(
+            os.path.join(opt.result_path, 'uncertainty.log'), ['epoch',
             'epistemic', 'aleatoric', 'random_param_mean', 'random_param_log_alpha',
             'total_param_mean', 'total_param_log_alpha'])
         del validation_data, target_transform, temporal_transform, spatial_transform
@@ -135,7 +137,7 @@ if __name__ == '__main__':
                         train_logger, train_batch_logger)
         if not opt.no_val:
             validation_loss = val_epoch(i, val_loader, model, criterion, opt,
-                                        val_logger)
+                                        val_logger, uncertainty_logger)
 
         if not opt.no_train and not opt.no_val:
             scheduler.step(validation_loss)

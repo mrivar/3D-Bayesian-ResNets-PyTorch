@@ -9,7 +9,7 @@ import math
 from utils import AverageMeter, calculate_test_accuracy
 
 
-def val_epoch(epoch, data_loader, model, criterion, opt, logger):
+def val_epoch(epoch, data_loader, model, criterion, opt, logger, uncertainty_logger):
     print('validation at epoch {}'.format(epoch))
 
     model.eval()
@@ -19,6 +19,8 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger):
     losses = AverageMeter()
     losses_logpy = AverageMeter()
     accuracies = AverageMeter()
+    accuracies_mean = AverageMeter()
+    accuracies_vote = AverageMeter()
     conf = []
     m = math.ceil(len(data_loader) / opt.batch_size)
 
@@ -29,8 +31,8 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger):
         if not opt.no_cuda:
             targets = targets.cuda(async=True)
         with torch.no_grad():
-            inputs = Variable(inputs)#, volatile=True)
-            targets = Variable(targets)#, volatile=True)
+            inputs = Variable(inputs).repeat(opt.num_samples, 1, 1, 1)#, volatile=True)
+            targets = Variable(targets).repeat(opt.num_samples, 1, 1, 1)#, volatile=True)
 
         if opt.bayesian:
             # Calculate beta
@@ -50,10 +52,12 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger):
         else:
             outputs = model(inputs)
             loss = criterion(outputs, targets)
-        acc, res = calculate_test_accuracy(softmax(outputs, dim=1), targets)
+        acc, acc_mean, acc_vote, res = calculate_test_accuracy(softmax(outputs, dim=1), targets, opt)
 
         losses.update(loss.data.item(), inputs.size(0))
         accuracies.update(acc, inputs.size(0))
+        accuracies_mean.update(acc_mean, inputs.size(0))
+        accuracies_vote.update(acc_vote, inputs.size(0))
 
         conf.append(res)
 
@@ -64,35 +68,38 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger):
               'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
               'Data {data_time.val:.3f} ({data_time.avg:.3f})\t'
               'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
-              'Acc {acc.val:.3f} ({acc.avg:.3f})'.format(
+              'Acc {acc.val:.3f} ({acc.avg:.3f})'
+              'AccMean {acc_mean.val:.3f} ({acc_mean.avg:.3f})'
+              'AccVote {acc_vote.val:.3f} ({acc_vote.avg:.3f})'.format(
                   epoch,
                   i + 1,
                   len(data_loader),
                   batch_time=batch_time,
                   data_time=data_time,
                   loss=losses,
-                  acc=accuracies))
-
+                  acc=accuracies,
+                  acc_mean=accuracies_mean,
+                  acc_vote=accuracies_vote), end="\r")
+    print()
     # Calculate aleatoric and epistemic uncertainty
     p_hat = np.array(conf)
     epistemic = np.mean(p_hat ** 2, axis=0) - np.mean(p_hat, axis=0) ** 2
     aleatoric = np.mean(p_hat * (1 - p_hat), axis=0)
 
     # Get random parameters mean and deviation
-    random_param_mean   = 0
-    random_param_log_alpha = 0
-    total_param_mean    = 0
-    total_param_log_alpha  = 0
+    random_param_mean,random_param_log_alpha,total_param_mean,total_param_log_alpha  = 0, 0, 0, 0
     for k,v in model.named_parameters():
-      if k == "module.layer1.1.conv1.qw_mean":
+      if k == "module.layer1.1.conv1.qw_mu":
         random_param_mean = v[0][0][0][0][0].item()
         total_param_mean = v.mean().item()
-      if k == "module.layer1.1.conv1.log_alpha":
+      if k == "module.layer1.1.conv1.qw_log_alpha":
         random_param_log_alpha = v.item()
-        total_param_log_alpha = v.item()
+        total_param_log_alpha = v.mean().item()
 
 
     logger.log({'epoch': epoch, 'loss': losses.avg, 'acc': accuracies.avg,
+      'acc_mean': accuracies_mean.avg, 'acc_vote': accuracies_vote.avg})
+    uncertainty_logger.log({'epoch': epoch,
       'epistemic': epistemic, 'aleatoric': aleatoric,
       'random_param_mean': random_param_mean, 'random_param_log_alpha': random_param_log_alpha,
       'total_param_mean': total_param_mean, 'total_param_log_alpha': total_param_log_alpha})

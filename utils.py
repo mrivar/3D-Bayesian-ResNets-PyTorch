@@ -71,5 +71,18 @@ def calculate_test_accuracy(outputs, targets):
     pred = pred.t()
     correct = pred.eq(targets.view(1, -1))
     n_correct_elems = correct.float().sum().data.item()
+    acc = n_correct_elems / batch_size
 
-    return n_correct_elems / batch_size, results[0].item()
+    acc_mean, acc_vote = acc, acc
+
+    if opt.bayesian and opt.num_samples > 1:
+        # acc_mean
+        _, predicted_mean = torch.max(outputs.view(opt.num_samples, batch_size, -1).mean(dim=0).data, 1)
+        correct_acc_mean += predicted_mean.cpu().eq(targets.data).sum().detach().item()
+        acc_mean = correct_acc_mean / batch_size
+        # acc_vote
+        votes, _ = pred.view(opt.num_samples, -1).mode(dim=0)
+        correct_acc_vote += votes.cpu().eq(targets.data).sum().detach().item()
+        acc_vote = correct_acc_vote / batch_size
+
+    return acc, acc_mean, acc_vote, results[0].detach().item()
