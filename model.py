@@ -60,6 +60,7 @@ def generate_model(opt):
                 sample_duration=opt.sample_duration)
     elif opt.model == 'BBBresnet':
         assert opt.model_depth in [10, 18, 34, 50, 101, 152, 200]
+        BayesianKwargs = {'q_logvar_init': opt.q_logvar_init, 'kl_calc': opt.kl_calc, 'bias': opt.bias}
 
         from models.BBBresnet import get_fine_tuning_parameters
 
@@ -68,43 +69,50 @@ def generate_model(opt):
                 num_classes=opt.n_classes,
                 shortcut_type=opt.resnet_shortcut,
                 sample_size=opt.sample_size,
-                sample_duration=opt.sample_duration)
+                sample_duration=opt.sample_duration,
+                **BayesianKwargs)
         elif opt.model_depth == 18:
             model = BBBresnet.resnet18(
                 num_classes=opt.n_classes,
                 shortcut_type=opt.resnet_shortcut,
                 sample_size=opt.sample_size,
-                sample_duration=opt.sample_duration)
+                sample_duration=opt.sample_duration,
+                **BayesianKwargs)
         elif opt.model_depth == 34:
             model = BBBresnet.resnet34(
                 num_classes=opt.n_classes,
                 shortcut_type=opt.resnet_shortcut,
                 sample_size=opt.sample_size,
-                sample_duration=opt.sample_duration)
+                sample_duration=opt.sample_duration,
+                **BayesianKwargs)
         elif opt.model_depth == 50:
             model = BBBresnet.resnet50(
                 num_classes=opt.n_classes,
                 shortcut_type=opt.resnet_shortcut,
                 sample_size=opt.sample_size,
-                sample_duration=opt.sample_duration)
+                sample_duration=opt.sample_duration,
+                **BayesianKwargs)
         elif opt.model_depth == 101:
             model = BBBresnet.resnet101(
                 num_classes=opt.n_classes,
                 shortcut_type=opt.resnet_shortcut,
                 sample_size=opt.sample_size,
-                sample_duration=opt.sample_duration)
+                sample_duration=opt.sample_duration,
+                **BayesianKwargs)
         elif opt.model_depth == 152:
             model = BBBresnet.resnet152(
                 num_classes=opt.n_classes,
                 shortcut_type=opt.resnet_shortcut,
                 sample_size=opt.sample_size,
-                sample_duration=opt.sample_duration)
+                sample_duration=opt.sample_duration,
+                **BayesianKwargs)
         elif opt.model_depth == 200:
             model = BBBresnet.resnet200(
                 num_classes=opt.n_classes,
                 shortcut_type=opt.resnet_shortcut,
                 sample_size=opt.sample_size,
-                sample_duration=opt.sample_duration)
+                sample_duration=opt.sample_duration,
+                **BayesianKwargs)
     elif opt.model == 'wideresnet':
         assert opt.model_depth in [50]
 

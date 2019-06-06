@@ -257,6 +257,9 @@ def parse_opts():
         '--bayesian',
         action='store_true',
         help='Set true if model is bayesian. It is set automatically.')
+    parser.add_argument('--kl_calc', action='store_true', help='Calculate KL')
+    parser.add_argument('--bias', action='store_true', help='Include bias')
+    parser.add_argument('--q_logvar_init', default=-5, type=int, help='q_logvar_init')
     parser.add_argument('--beta_type',
         default="Blundell",
         type=str,
