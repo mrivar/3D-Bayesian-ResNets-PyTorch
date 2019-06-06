@@ -80,7 +80,7 @@ def parse_opts():
         'Spatial cropping method in training. random is uniform. corner is selection from 4 corners and 1 center.  (random | corner | center)'
     )
     parser.add_argument(
-        '--learning_rate',
+        '--learning_rate', '--lr',
         default=0.1,
         type=float,
         help=
@@ -110,20 +110,20 @@ def parse_opts():
         '--nesterov', action='store_true', help='Nesterov momentum')
     parser.set_defaults(nesterov=False)
     parser.add_argument(
-        '--optimizer',
+        '--optimizer', '--opt',
         default='adam',
         const='adam',
         nargs='?',
         choices=['sgd', 'adam', 'amsgrad'],
         help='( sgd | adam | amsgrad |')
     parser.add_argument(
-        '--lr_patience',
+        '--lr_patience', '--lr_p',
         default=10,
         type=int,
         help='Patience of LR scheduler. See documentation of ReduceLROnPlateau.'
     )
     parser.add_argument(
-        '--batch_size', default=128, type=int, help='Batch Size')
+        '--batch_size', '--bs', default=128, type=int, help='Batch Size')
     parser.add_argument(
         '--n_epochs',
         default=200,
@@ -195,12 +195,12 @@ def parse_opts():
         type=int,
         help='Number of threads for multi-thread loading')
     parser.add_argument(
-        '--checkpoint',
+        '--checkpoint', '--ckpt',
         default=10,
         type=int,
         help='Trained model is saved at every this epochs.')
     parser.add_argument(
-        '--keep_n_checkpoints',
+        '--keep_n_checkpoints', '--keep_n_ckpt',
         default=5,
         type=int,
         help='Number of checkpoints to keep.')
@@ -261,7 +261,6 @@ def parse_opts():
     parser.add_argument('--bias', action='store_true', help='Include bias')
     parser.add_argument('--q_logvar_init', default=-5, type=int, help='q_logvar_init')
     parser.add_argument('--num_samples', default=10, type=int, help='Number of samples')
-    parser.add_argument('--scaleVideo', action='store_true', help='Scale videos to small size as preprocessing')
     parser.add_argument('--beta_type',
         default="Blundell",
         type=str,
