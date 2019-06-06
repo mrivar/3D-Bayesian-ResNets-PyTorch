@@ -5,6 +5,8 @@ import torch
 from torch import nn
 from torch import optim
 from torch.optim import lr_scheduler
+import torchvision.transforms as transforms
+from PIL.Image import CUBIC
 
 from opts import parse_opts
 from model import generate_model
@@ -51,6 +53,9 @@ if __name__ == '__main__':
         elif opt.train_crop == 'center':
             crop_method = MultiScaleCornerCrop(
                 opt.scales, opt.sample_size, crop_positions=['c'])
+        elif opt.train_crop == 'rescale':
+            #crop_method = transforms.Resize((opt.sample_size, opt.sample_size), interpolation=CUBIC)
+            crop_method = Scale(opt.sample_size, interpolation=CUBIC)
         spatial_transform = Compose([
             crop_method,
             RandomHorizontalFlip(),
@@ -96,11 +101,18 @@ if __name__ == '__main__':
             optimizer, 'min', patience=opt.lr_patience)
         del training_data, target_transform, temporal_transform, spatial_transform, parameters, crop_method
     if not opt.no_val:
-        spatial_transform = Compose([
-            Scale(opt.sample_size),
-            CenterCrop(opt.sample_size),
-            ToTensor(opt.norm_value), norm_method
-        ])
+        if opt.train_crop == 'resize':
+            spatial_transform = Compose([
+                #transforms.Resize((opt.sample_size, opt.sample_size), interpolation=CUBIC),
+                Scale(opt.sample_size, interpolation=CUBIC)
+                ToTensor(opt.norm_value), norm_method
+                ])
+        else:
+            spatial_transform = Compose([
+                Scale(opt.sample_size),
+                CenterCrop(opt.sample_size),
+                ToTensor(opt.norm_value), norm_method
+            ])
         temporal_transform = LoopPadding(opt.sample_duration)
         target_transform = ClassLabel()
         validation_data = get_validation_set(
