@@ -54,7 +54,7 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger, uncertainty_log
             loss = criterion(outputs, targets)
         acc, acc_mean, acc_vote, res = calculate_test_accuracy(softmax(outputs, dim=1), targets, opt)
 
-        losses.update(loss.data.item(), inputs.size(0))
+        losses.update(loss.data.detach().item(), inputs.size(0))
         accuracies.update(acc, inputs.size(0))
         accuracies_mean.update(acc_mean, inputs.size(0))
         accuracies_vote.update(acc_vote, inputs.size(0))
