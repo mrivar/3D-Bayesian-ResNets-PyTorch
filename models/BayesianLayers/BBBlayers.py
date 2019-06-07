@@ -5,7 +5,7 @@ from torch.autograd import Variable
 from torch.nn import Parameter
 import torch.nn.functional as F
 from .BBBdistributions import Normal, Normalout, distribution_selector
-from torch.nn.modules.utils import _pair
+from torch.nn.modules.utils import _pair, _triple
 import numpy as np
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -144,6 +144,46 @@ class BBBConv2d(_ConvNd):
         dilation = _pair(dilation)
 
         super(BBBConv2d, self).__init__(in_channels, out_channels, kernel_size, stride, padding, dilation, _pair(0), groups, **kwargs)
+
+    def forward(self, input):
+        return self.convprobforward(input)
+
+    def convprobforward(self, input):
+        """
+        Convolutional probabilistic forwarding method.
+        :param input: data tensor
+        :return: output, KL-divergence
+        """
+        # local reparameterization trick for convolutional layer
+        qw_mean = F.conv2d(input=input, weight=self.qw_mu, bias=self.qw_mu_b, stride=self.stride, padding=self.padding,
+                           dilation=self.dilation, groups=self.groups).to(DEVICE)
+        qw_std = torch.sqrt(1e-8 + F.conv2d(input=input.pow(2), weight=self.qw_var, bias=self.qw_alpha_b,
+                                            stride=self.stride, padding=self.padding, dilation=self.dilation, groups=self.groups)).to(DEVICE)
+
+        # sample from output
+        output = qw_mean + qw_std * (self._random(qw_std.size())).to(DEVICE)
+        output.to(DEVICE)
+
+
+        # KL divergence
+        kl = 0
+        if self.training and self.kl_calc:
+            #kl = self.complexity_cost(output, qw_mean, qw_std, 0, self.pw_std)
+            kl = self.kl(qw_mean, qw_std)
+
+        return output, kl
+
+
+class BBBConv3d(_ConvNd):
+    def __init__(self, in_channels, out_channels, kernel_size, stride=1,
+                 padding=0, dilation=1, groups=1, **kwargs):
+
+        kernel_size = _triple(kernel_size)
+        stride = _triple(stride)
+        padding = _triple(padding)
+        dilation = _triple(dilation)
+
+        super(BBBConv2d, self).__init__(in_channels, out_channels, kernel_size, stride, padding, dilation, _triple(0), groups, **kwargs)
 
     def forward(self, input):
         return self.convprobforward(input)
