@@ -291,8 +291,8 @@ def parse_opts():
         args.video_path = os.path.join(args.root_path, args.video_path)
         args.annotation_path = os.path.join(args.root_path, args.annotation_path)
         args.checkpoints_path = os.path.join(args.root_path, args.result_path)
-        if not os.path.isdir(args.result_path):
-            os.makedirs(args.result_path)
+        #if not os.path.isdir(args.result_path):
+        #    os.makedirs(args.result_path)
         if not os.path.isdir(args.checkpoints_path):
             os.makedirs(args.checkpoints_path)
         if args.resume_path:

@@ -183,7 +183,7 @@ class BBBConv3d(_ConvNd):
         padding = _triple(padding)
         dilation = _triple(dilation)
 
-        super(BBBConv2d, self).__init__(in_channels, out_channels, kernel_size, stride, padding, dilation, _triple(0), groups, **kwargs)
+        super(BBBConv3d, self).__init__(in_channels, out_channels, kernel_size, stride, padding, dilation, _triple(0), groups, **kwargs)
 
     def forward(self, input):
         return self.convprobforward(input)
@@ -195,9 +195,9 @@ class BBBConv3d(_ConvNd):
         :return: output, KL-divergence
         """
         # local reparameterization trick for convolutional layer
-        qw_mean = F.conv2d(input=input, weight=self.qw_mu, bias=self.qw_mu_b, stride=self.stride, padding=self.padding,
+        qw_mean = F.conv3d(input=input, weight=self.qw_mu, bias=self.qw_mu_b, stride=self.stride, padding=self.padding,
                            dilation=self.dilation, groups=self.groups).to(DEVICE)
-        qw_std = torch.sqrt(1e-8 + F.conv2d(input=input.pow(2), weight=self.qw_var, bias=self.qw_alpha_b,
+        qw_std = torch.sqrt(1e-8 + F.conv3d(input=input.pow(2), weight=self.qw_var, bias=self.qw_alpha_b,
                                             stride=self.stride, padding=self.padding, dilation=self.dilation, groups=self.groups)).to(DEVICE)
 
         # sample from output

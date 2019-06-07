@@ -41,7 +41,7 @@ def train_epoch(epoch, data_loader, model, criterion, optimizer, opt,
                 beta = 0
             # Forward Propagation (with KL calc.)
             outputs, kl = model(inputs)
-            loss = criterion(outputs, targets, kl, beta)
+            loss, _ = criterion(outputs, targets, kl, beta)
         else:
             outputs = model(inputs)
             loss = criterion(outputs, targets)

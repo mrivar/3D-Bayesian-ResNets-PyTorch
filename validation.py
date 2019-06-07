@@ -46,8 +46,7 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger, uncertainty_log
                 beta = 0
             # Forward Propagation (with KL calc.)
             outputs, kl = model(inputs)
-            loss = criterion(outputs, targets, kl, beta)
-            logpy = criterion.loss(outputs, targets)
+            loss, logpy = criterion(outputs, targets, kl, beta)
             losses_logpy.update(logpy.data.item(), inputs.size(0))
         else:
             outputs = model(inputs)
@@ -68,8 +67,8 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger, uncertainty_log
               'Time {batch_time.avg:.3f} ({batch_time.val:.3f})\t'
               'Data {data_time.avg:.3f} ({data_time.val:.3f})\t'
               'Loss {loss.avg:.4f} ({loss.val:.4f})\t'
-              'Acc {acc.avg:.3f} ({acc.val:.3f})'
-              'AccMean {acc_mean.avg:.3f} ({acc_mean.val:.3f})'
+              'Acc {acc.avg:.3f} ({acc.val:.3f})\t'
+              'AccMean {acc_mean.avg:.3f} ({acc_mean.val:.3f})\t'
               'AccVote {acc_vote.avg:.3f} ({acc_vote.val:.3f})'.format(
                   epoch,
                   i + 1,
