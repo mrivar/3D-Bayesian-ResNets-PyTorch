@@ -7,6 +7,7 @@ from torch import optim
 from torch.optim import lr_scheduler
 import torchvision.transforms as transforms
 from PIL.Image import CUBIC
+from time import time
 
 from opts import parse_opts
 from model import generate_model
@@ -17,7 +18,7 @@ from temporal_transforms import LoopPadding, TemporalRandomCrop
 from target_transforms import ClassLabel, VideoID
 from target_transforms import Compose as TargetCompose
 from dataset import get_training_set, get_validation_set, get_test_set
-from utils import Logger
+from utils import Logger, get_hms
 from train import train_epoch
 from validation import val_epoch
 import test
@@ -45,7 +46,7 @@ if __name__ == '__main__':
         norm_method = Normalize(opt.mean, opt.std)
 
     if not opt.no_train:
-        assert opt.train_crop in ['random', 'corner', 'center']
+        assert opt.train_crop in ['random', 'corner', 'center', 'rescale']
         if opt.train_crop == 'random':
             crop_method = MultiScaleRandomCrop(opt.scales, opt.sample_size)
         elif opt.train_crop == 'corner':
@@ -142,6 +143,7 @@ if __name__ == '__main__':
             optimizer.load_state_dict(checkpoint['optimizer'])
         del checkpoint
 
+    start_time = time()
     print('run')
     for i in range(opt.begin_epoch, opt.n_epochs + 1):
         if not opt.no_train:
@@ -153,6 +155,9 @@ if __name__ == '__main__':
 
         if not opt.no_train and not opt.no_val:
             scheduler.step(validation_loss)
+
+        elapsed_time = time() - start_time
+        print('| Elapsed time : %d:%02d:%02d' %(get_hms(elapsed_time)))
 
     if opt.test:
         spatial_transform = Compose([

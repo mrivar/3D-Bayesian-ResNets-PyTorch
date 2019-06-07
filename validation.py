@@ -10,7 +10,7 @@ from utils import AverageMeter, calculate_test_accuracy
 
 
 def val_epoch(epoch, data_loader, model, criterion, opt, logger, uncertainty_logger):
-    print('validation at epoch {}'.format(epoch))
+    #print('validation at epoch {}'.format(epoch))
 
     model.eval()
 
@@ -31,8 +31,8 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger, uncertainty_log
         if not opt.no_cuda:
             targets = targets.cuda(async=True)
         with torch.no_grad():
-            inputs = Variable(inputs).repeat(opt.num_samples, 1, 1, 1)#, volatile=True)
-            targets = Variable(targets).repeat(opt.num_samples, 1, 1, 1)#, volatile=True)
+            inputs = Variable(inputs).repeat(opt.num_samples, 1, 1, 1, 1)#, volatile=True)
+            targets = Variable(targets).repeat(opt.num_samples)#, volatile=True)
 
         if opt.bayesian:
             # Calculate beta
@@ -64,13 +64,13 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger, uncertainty_log
         batch_time.update(time.time() - end_time)
         end_time = time.time()
 
-        print('Epoch: [{0}][{1}/{2}]\t'
-              'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
-              'Data {data_time.val:.3f} ({data_time.avg:.3f})\t'
-              'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
-              'Acc {acc.val:.3f} ({acc.avg:.3f})'
-              'AccMean {acc_mean.val:.3f} ({acc_mean.avg:.3f})'
-              'AccVote {acc_vote.val:.3f} ({acc_vote.avg:.3f})'.format(
+        print('| Epoch: [{0}][{1}/{2}]\t'
+              'Time {batch_time.avg:.3f} ({batch_time.val:.3f})\t'
+              'Data {data_time.avg:.3f} ({data_time.val:.3f})\t'
+              'Loss {loss.avg:.4f} ({loss.val:.4f})\t'
+              'Acc {acc.avg:.3f} ({acc.val:.3f})'
+              'AccMean {acc_mean.avg:.3f} ({acc_mean.val:.3f})'
+              'AccVote {acc_vote.avg:.3f} ({acc_vote.val:.3f})'.format(
                   epoch,
                   i + 1,
                   len(data_loader),
@@ -79,7 +79,7 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger, uncertainty_log
                   loss=losses,
                   acc=accuracies,
                   acc_mean=accuracies_mean,
-                  acc_vote=accuracies_vote), end="\r")
+                  acc_vote=accuracies_vote), end='\r')
     print()
     # Calculate aleatoric and epistemic uncertainty
     p_hat = np.array(conf)

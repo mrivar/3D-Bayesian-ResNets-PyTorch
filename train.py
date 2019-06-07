@@ -10,7 +10,7 @@ from utils import AverageMeter, calculate_accuracy
 
 def train_epoch(epoch, data_loader, model, criterion, optimizer, opt,
                 epoch_logger, batch_logger):
-    print('train at epoch {}'.format(epoch))
+    #print('train at epoch {}'.format(epoch))
 
     model.train()
 
@@ -20,6 +20,7 @@ def train_epoch(epoch, data_loader, model, criterion, optimizer, opt,
     accuracies = AverageMeter()
     m = math.ceil(len(data_loader) / opt.batch_size)
 
+    print('\n=> Training Epoch #%d, LR=%s' %(epoch, optimizer.param_groups[0]['lr']))
     end_time = time.time()
     for i, (inputs, targets) in enumerate(data_loader):
         data_time.update(time.time() - end_time)
@@ -65,11 +66,11 @@ def train_epoch(epoch, data_loader, model, criterion, optimizer, opt,
             'lr': optimizer.param_groups[0]['lr']
         })
 
-        print('Epoch: [{0}][{1}/{2}]\t'
-              'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
-              'Data {data_time.val:.3f} ({data_time.avg:.3f})\t'
-              'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
-              'Acc {acc.val:.3f} ({acc.avg:.3f})'.format(
+        print('| Epoch: [{0}][{1}/{2}]\t'
+              'Time {batch_time.avg:.3f} ({batch_time.val:.3f})\t'
+              'Data {data_time.avg:.3f} ({data_time.val:.3f})\t'
+              'Loss {loss.avg:.4f} ({loss.val:.4f})\t'
+              'Acc {acc.avg:.3f} ({acc.val:.3f})'.format(
                   epoch,
                   i + 1,
                   len(data_loader),
