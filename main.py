@@ -28,7 +28,7 @@ if __name__ == '__main__':
     torch.manual_seed(opt.manual_seed)
 
     model, parameters = generate_model(opt)
-    print(model)
+    #print(model)
     criterion = nn.CrossEntropyLoss()
     if not opt.no_cuda:
         criterion = criterion.cuda()
@@ -72,10 +72,10 @@ if __name__ == '__main__':
             num_workers=opt.n_threads,
             pin_memory=True)
         train_logger = Logger(
-            os.path.join(opt.result_path, 'train.log'),
+            os.path.join(opt.result_path_logs, '_train.log'),
             ['epoch', 'loss', 'acc', 'lr'])
         train_batch_logger = Logger(
-            os.path.join(opt.result_path, 'train_batch.log'),
+            os.path.join(opt.result_path_logs, '_train_batch.log'),
             ['epoch', 'batch', 'iter', 'loss', 'acc', 'lr'])
 
         if opt.nesterov:
@@ -124,9 +124,9 @@ if __name__ == '__main__':
             num_workers=opt.n_threads,
             pin_memory=True)
         val_logger = Logger(
-            os.path.join(opt.result_path, 'val.log'), ['epoch', 'loss', 'acc', 'acc_mean', 'acc_vote'])
+            os.path.join(opt.result_path_logs, '_val.log'), ['epoch', 'loss', 'acc', 'acc_mean', 'acc_vote'])
         uncertainty_logger = Logger(
-            os.path.join(opt.result_path, 'uncertainty.log'), ['epoch',
+            os.path.join(opt.result_path_logs, '_uncertainty.log'), ['epoch',
             'epistemic', 'aleatoric', 'random_param_mean', 'random_param_log_alpha',
             'total_param_mean', 'total_param_log_alpha'])
         del validation_data, target_transform, temporal_transform, spatial_transform

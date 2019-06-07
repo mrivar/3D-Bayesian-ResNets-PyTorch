@@ -280,11 +280,11 @@ def parse_opts():
     args.video_path = VIDEO_PATH[args.dataset]
     try: args.annotation_path = ANNOTATION_PATH[args.dataset]%args.split
     except: args.annotation_path = ANNOTATION_PATH[args.dataset]
-    args.result_path = args.result_path or create_results_dir_name(args)
     args.n_classes = NUM_CLASSES[args.dataset]
     args.bayesian = BAYESIAN[args.model]
     if not args.bayesian: args.num_samples = 1
-
+    args.result_path_logs = args.result_path or create_results_dir_name(args)
+    args.result_path = args.result_path + os.sep
 
     # Build opts
     if args.root_path != '':
@@ -306,7 +306,7 @@ def parse_opts():
     args.mean = get_mean(args.norm_value, dataset=args.mean_dataset)
     args.std = get_std(args.norm_value)
     print(args)
-    with open(os.path.join(args.result_path, 'opts.json'), 'w') as opt_file:
+    with open(os.path.join(args.result_path_logs, '_opts.json'), 'w') as opt_file:
         json.dump(vars(args), opt_file)
 
     return args

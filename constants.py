@@ -27,7 +27,8 @@ ANNOTATION_PATH = {'mnist': None,
                   'ucfsports': 'ucfsports_%d.json',
                   'ucf11': None}
 
-RESULT_PATH = 'results/%s_%s%d_%s__%d/'
+RESULT_PATH = 'results/%s/%s_%s%d%s'
+RESULT_PATH_W_COUNTER = 'results/%s_%s%d_%s__%d/'
 
 NUM_CLASSES = {'mnist': 10,
                'hmdb51': 51,
@@ -47,10 +48,19 @@ BAYESIAN = {'resnet': False,
             'BBBresnet': True}
 
 def create_results_dir_name(args):
+  name = RESULT_PATH%(
+    args.dataset,
+    args.dataset,
+    args.model,
+    args.model_depth,
+    '_q%d'%args.q_logvar_init if args.bayesian else '')
+  return name
+
+def create_results_dir_name_with_counter(args):
   counter = 0
   while True:
     counter += 1
-    name = RESULT_PATH%(
+    name = RESULT_PATH_W_COUNTER%(
       args.dataset,
       args.model,
       args.model_depth,
