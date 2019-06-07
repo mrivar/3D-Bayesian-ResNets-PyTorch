@@ -31,29 +31,32 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger, uncertainty_log
         if not opt.no_cuda:
             targets = targets.cuda(async=True)
         with torch.no_grad():
-            inputs = Variable(inputs).repeat(opt.num_samples, 1, 1, 1, 1)#, volatile=True)
-            targets = Variable(targets).repeat(opt.num_samples)#, volatile=True)
+            inputs = Variable(inputs)#, volatile=True)
+            targets = Variable(targets)#, volatile=True)
 
-        if opt.bayesian:
-            # Calculate beta
-            if opt.beta_type is "Blundell":
-                beta = 2 ** (m - (i + 1)) / (2 ** m - 1)
-            elif opt.beta_type is "Soenderby":
-                beta = min(epoch / (opt.n_epochs // 4), 1)
-            elif opt.beta_type is "Standard":
-                beta = 1 / m
+        outputs = torch.tensor([])
+        for i in range(opt.num_samples):
+            if opt.bayesian:
+                # Calculate beta
+                if opt.beta_type is "Blundell":
+                    beta = 2 ** (m - (i + 1)) / (2 ** m - 1)
+                elif opt.beta_type is "Soenderby":
+                    beta = min(epoch / (opt.n_epochs // 4), 1)
+                elif opt.beta_type is "Standard":
+                    beta = 1 / m
+                else:
+                    beta = 0
+                # Forward Propagation (with KL calc.)
+                outputs_aux, kl = model(inputs)
+                loss, logpy = criterion(outputs_aux, targets, kl, beta)
+                losses_logpy.update(logpy.data.detach().item(), inputs.size(0))
             else:
-                beta = 0
-            # Forward Propagation (with KL calc.)
-            outputs, kl = model(inputs)
-            loss, logpy = criterion(outputs, targets, kl, beta)
-            losses_logpy.update(logpy.data.item(), inputs.size(0))
-        else:
-            outputs = model(inputs)
-            loss = criterion(outputs, targets)
-        acc, acc_mean, acc_vote, res = calculate_test_accuracy(softmax(outputs, dim=1), targets, opt)
+                outputs_aux = model(inputs)
+                loss = criterion(outputs_aux, targets)
+            outputs = torch.cat((ouputs, outputs_aux), 0)
+            losses.update(loss.data.detach().item(), inputs.size(0))
 
-        losses.update(loss.data.detach().item(), inputs.size(0))
+        acc, acc_mean, acc_vote, res = calculate_test_accuracy(softmax(outputs, dim=1), targets, opt)
         accuracies.update(acc, inputs.size(0))
         accuracies_mean.update(acc_mean, inputs.size(0))
         accuracies_vote.update(acc_vote, inputs.size(0))
