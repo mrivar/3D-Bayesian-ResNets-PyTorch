@@ -7,6 +7,7 @@ import sys
 import math
 
 from utils import AverageMeter, calculate_test_accuracy
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 def val_epoch(epoch, data_loader, model, criterion, opt, logger, uncertainty_logger):
@@ -34,29 +35,29 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger, uncertainty_log
             inputs = Variable(inputs)#, volatile=True)
             targets = Variable(targets)#, volatile=True)
 
-        outputs = torch.tensor([])
-        for i in range(opt.num_samples):
-            if opt.bayesian:
-                # Calculate beta
-                if opt.beta_type is "Blundell":
-                    beta = 2 ** (m - (i + 1)) / (2 ** m - 1)
-                elif opt.beta_type is "Soenderby":
-                    beta = min(epoch / (opt.n_epochs // 4), 1)
-                elif opt.beta_type is "Standard":
-                    beta = 1 / m
+            outputs = torch.tensor([]).to(DEVICE)
+            for _ in range(opt.num_samples):
+                if opt.bayesian:
+                    # Calculate beta
+                    if opt.beta_type is "Blundell":
+                        beta = 2 ** (m - (i + 1)) / (2 ** m - 1)
+                    elif opt.beta_type is "Soenderby":
+                        beta = min(epoch / (opt.n_epochs // 4), 1)
+                    elif opt.beta_type is "Standard":
+                        beta = 1 / m
+                    else:
+                        beta = 0
+                    # Forward Propagation (with KL calc.)
+                    outputs_aux, kl = model(inputs)
+                    loss, logpy = criterion(outputs_aux, targets, kl, beta)
+                    losses_logpy.update(logpy.data.detach().item(), inputs.size(0))
                 else:
-                    beta = 0
-                # Forward Propagation (with KL calc.)
-                outputs_aux, kl = model(inputs)
-                loss, logpy = criterion(outputs_aux, targets, kl, beta)
-                losses_logpy.update(logpy.data.detach().item(), inputs.size(0))
-            else:
-                outputs_aux = model(inputs)
-                loss = criterion(outputs_aux, targets)
-            outputs = torch.cat((ouputs, outputs_aux), 0)
-            losses.update(loss.data.detach().item(), inputs.size(0))
+                    outputs_aux = model(inputs)
+                    loss = criterion(outputs_aux, targets)
+                outputs = torch.cat((outputs, outputs_aux), 0)
+                losses.update(loss.data.detach().item(), inputs.size(0))
 
-        acc, acc_mean, acc_vote, res = calculate_test_accuracy(softmax(outputs, dim=1), targets, opt)
+        acc, acc_mean, acc_vote, res = calculate_test_accuracy(softmax(outputs, dim=1), targets, targets.repeat(opt.num_samples), opt)
         accuracies.update(acc, inputs.size(0))
         accuracies_mean.update(acc_mean, inputs.size(0))
         accuracies_vote.update(acc_vote, inputs.size(0))
@@ -95,7 +96,7 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger, uncertainty_log
         random_param_mean = v[0][0][0][0][0].item()
         total_param_mean = v.mean().item()
       if k == "module.layer1.1.conv1.qw_log_alpha":
-        random_param_log_alpha = v.item()
+        random_param_log_alpha = v[0][0][0][0][0].item()
         total_param_log_alpha = v.mean().item()
 
 

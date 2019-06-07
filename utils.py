@@ -1,3 +1,4 @@
+import torch
 import csv
 import os
 
@@ -64,26 +65,26 @@ def calculate_accuracy(outputs, targets):
 
     return 100*n_correct_elems / batch_size
 
-def calculate_test_accuracy(outputs, targets, opt):
-    batch_size = targets.size(0)
+def calculate_test_accuracy(outputs, targets, y, opt):
+    batch_size = y.size(0)
 
     results, pred = outputs.topk(1, 1, True)
     pred = pred.t()
-    correct = pred.eq(targets.view(1, -1))
+    correct = pred.eq(y.view(1, -1))
     n_correct_elems = correct.float().sum().data.detach().item()
-    acc = 100*n_correct_elems / batch_size
+    acc = 100 * n_correct_elems / batch_size
 
+    batch_size = targets.size(0)
     acc_mean, acc_vote = acc, acc
-
     if opt.bayesian and opt.num_samples > 1:
         # acc_mean
         _, predicted_mean = torch.max(outputs.view(opt.num_samples, batch_size, -1).mean(dim=0).data, 1)
-        correct_acc_mean += predicted_mean.cpu().eq(targets.data).sum().detach().item()
+        correct_acc_mean = predicted_mean.eq(targets.data).sum().detach().item()
         acc_mean = 100*correct_acc_mean / batch_size
         # acc_vote
         votes, _ = pred.view(opt.num_samples, -1).mode(dim=0)
-        correct_acc_vote += votes.cpu().eq(targets.data).sum().detach().item()
-        acc_vote =100* correct_acc_vote / batch_size
+        correct_acc_vote = votes.eq(targets.data).sum().detach().item()
+        acc_vote = 100*correct_acc_vote / batch_size
 
     return acc, acc_mean, acc_vote, results[0].detach().item()
 
