@@ -72,10 +72,10 @@ if __name__ == '__main__':
             num_workers=opt.n_threads,
             pin_memory=True)
         train_logger = Logger(
-            os.path.join(opt.result_path_logs, '_train.log'),
+            opt.result_path_logs+'_train.log',
             ['epoch', 'loss', 'acc', 'lr'])
         train_batch_logger = Logger(
-            os.path.join(opt.result_path_logs, '_train_batch.log'),
+            opt.result_path_logs+'_train_batch.log',
             ['epoch', 'batch', 'iter', 'loss', 'acc', 'lr'])
 
         if opt.nesterov:
@@ -101,10 +101,10 @@ if __name__ == '__main__':
             optimizer, 'min', patience=opt.lr_patience)
         del training_data, target_transform, temporal_transform, spatial_transform, parameters, crop_method
     if not opt.no_val:
-        if opt.train_crop == 'resize':
+        if opt.train_crop == 'rescale':
             spatial_transform = Compose([
                 #transforms.Resize((opt.sample_size, opt.sample_size), interpolation=CUBIC),
-                Scale(opt.sample_size, interpolation=CUBIC)
+                Scale(opt.sample_size, interpolation=CUBIC),
                 ToTensor(opt.norm_value), norm_method
                 ])
         else:
@@ -124,9 +124,9 @@ if __name__ == '__main__':
             num_workers=opt.n_threads,
             pin_memory=True)
         val_logger = Logger(
-            os.path.join(opt.result_path_logs, '_val.log'), ['epoch', 'loss', 'acc', 'acc_mean', 'acc_vote'])
+            opt.result_path_logs+'_val.log', ['epoch', 'loss', 'acc', 'acc_mean', 'acc_vote'])
         uncertainty_logger = Logger(
-            os.path.join(opt.result_path_logs, '_uncertainty.log'), ['epoch',
+            opt.result_path_logs+'_uncertainty.log', ['epoch',
             'epistemic', 'aleatoric', 'random_param_mean', 'random_param_log_alpha',
             'total_param_mean', 'total_param_log_alpha'])
         del validation_data, target_transform, temporal_transform, spatial_transform
