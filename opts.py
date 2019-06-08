@@ -8,6 +8,7 @@ from constants import *
 
 def parse_opts():
     parser = argparse.ArgumentParser()
+    parser.add_argument('--oth', action='store_true')
     parser.add_argument(
         '--dataset',
         default='kinetics',
@@ -141,6 +142,11 @@ def parse_opts():
         default=3,
         type=int,
         help='Number of validation samples for each activity')
+    parser.add_argument(
+        '--n_tra_samples',
+        default=1,
+        type=int,
+        help='Number of training samples for each activity')
     parser.add_argument(
         '--resume_path',
         default='',
