@@ -13,34 +13,42 @@ def get_training_set(opt, spatial_transform, temporal_transform,
             opt.video_path,
             opt.annotation_path,
             'training',
+            opt.n_tra_samples,
             spatial_transform=spatial_transform,
             temporal_transform=temporal_transform,
-            target_transform=target_transform)
+            target_transform=target_transform,
+            sample_duration=opt.sample_duration)
     elif opt.dataset == 'activitynet':
         training_data = ActivityNet(
             opt.video_path,
             opt.annotation_path,
             'training',
             False,
+            opt.n_tra_samples,
             spatial_transform=spatial_transform,
             temporal_transform=temporal_transform,
-            target_transform=target_transform)
+            target_transform=target_transform,
+            sample_duration=opt.sample_duration)
     elif opt.dataset == 'ucf101' or opt.dataset == 'ucfsports':
         training_data = UCF101(
             opt.video_path,
             opt.annotation_path,
             'training',
+            opt.n_tra_samples,
             spatial_transform=spatial_transform,
             temporal_transform=temporal_transform,
-            target_transform=target_transform)
+            target_transform=target_transform,
+            sample_duration=opt.sample_duration)
     elif opt.dataset == 'hmdb51' or opt.dataset == 'jhmdb' or opt.dataset == 'infar':
         training_data = HMDB51(
             opt.video_path,
             opt.annotation_path,
             'training',
+            opt.n_tra_samples,
             spatial_transform=spatial_transform,
             temporal_transform=temporal_transform,
-            target_transform=target_transform)
+            target_transform=target_transform,
+            sample_duration=opt.sample_duration)
 
     return training_data
 
