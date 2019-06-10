@@ -81,6 +81,16 @@ def parse_opts():
         'Spatial cropping method in training. random is uniform. corner is selection from 4 corners and 1 center.  (random | corner | center)'
     )
     parser.add_argument(
+        '--train_temporal_crop', '--ttc',
+        default='random',
+        type=str,
+        help='Temporal cropping. random or center of sample.')
+    parser.add_argument(
+        '--val_temporal_crop', '--vtc',
+        default='loop',
+        type=str,
+        help='Temporal cropping in validation set. Random, center or looppading')
+    parser.add_argument(
         '--learning_rate', '--lr',
         default=0.1,
         type=float,

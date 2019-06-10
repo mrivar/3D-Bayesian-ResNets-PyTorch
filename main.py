@@ -48,6 +48,7 @@ if __name__ == '__main__':
 
     if not opt.no_train:
         assert opt.train_crop in ['random', 'corner', 'center', 'rescale']
+        assert opt.train_temporal_crop in ['center', 'random']
         if opt.train_crop == 'random':
             crop_method = MultiScaleRandomCrop(opt.scales, opt.sample_size)
         elif opt.train_crop == 'corner':
@@ -64,6 +65,8 @@ if __name__ == '__main__':
             ToTensor(opt.norm_value), norm_method
         ])
         temporal_transform = TemporalCenterCrop(opt.sample_duration)
+        if opt.train_temporal_crop == 'random':
+            temporal_transform = TemporalRandomCrop(opt.sample_duration)
         target_transform = ClassLabel()
         training_data = get_training_set(opt, spatial_transform,
                                          temporal_transform, target_transform)
@@ -115,7 +118,12 @@ if __name__ == '__main__':
                 CenterCrop(opt.sample_size),
                 ToTensor(opt.norm_value), norm_method
             ])
-        temporal_transform = TemporalCenterCrop(opt.sample_duration)
+        assert opt.val_temporal_crop in ['loop', 'random', 'center']
+        temporal_transform = LoopPadding(opt.sample_duration)
+        if opt.val_temporal_crop == 'center':
+            temporal_transform = TemporalCenterCrop(opt.sample_duration)
+        elif opt.val_temporal_crop == 'random':
+            temporal_transform = TemporalRandomCrop(opt.sample_duration)
         target_transform = ClassLabel()
         validation_data = get_validation_set(
             opt, spatial_transform, temporal_transform, target_transform)
