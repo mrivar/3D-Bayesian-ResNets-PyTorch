@@ -13,7 +13,7 @@ def class_process(dir_path, dst_dir_path, class_name):
     os.mkdir(dst_class_path)
 
   for file_name in os.listdir(class_path):
-    if '.avi' not in file_name:
+    if '.avi' not in file_name and '.mpg' not in file_name:
       continue
     name, ext = os.path.splitext(file_name)
     dst_directory_path = os.path.join(dst_class_path, name)

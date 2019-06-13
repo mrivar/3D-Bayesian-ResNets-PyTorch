@@ -6,7 +6,7 @@ from datasets.hmdb51 import HMDB51
 
 def get_training_set(opt, spatial_transform, temporal_transform,
                      target_transform):
-    assert opt.dataset in ['kinetics', 'activitynet', 'ucf101', 'hmdb51', 'jhmdb', 'ucfsports', 'infar']
+    assert opt.dataset in ['kinetics', 'activitynet', 'ucf101', 'hmdb51', 'jhmdb', 'ucfsports', 'ucf11', 'infar', 'kth']
 
     if opt.dataset == 'kinetics':
         training_data = Kinetics(
@@ -29,7 +29,7 @@ def get_training_set(opt, spatial_transform, temporal_transform,
             temporal_transform=temporal_transform,
             target_transform=target_transform,
             sample_duration=opt.sample_duration)
-    elif opt.dataset == 'ucf101' or opt.dataset == 'ucfsports':
+    elif opt.dataset == 'ucf101' or opt.dataset == 'ucfsports' or opt.dataset == 'ucf11':
         training_data = UCF101(
             opt.video_path,
             opt.annotation_path,
@@ -39,7 +39,7 @@ def get_training_set(opt, spatial_transform, temporal_transform,
             temporal_transform=temporal_transform,
             target_transform=target_transform,
             sample_duration=opt.sample_duration)
-    elif opt.dataset == 'hmdb51' or opt.dataset == 'jhmdb' or opt.dataset == 'infar':
+    elif opt.dataset in ['hmdb51', 'jhmdb', 'infar', 'kth']:
         training_data = HMDB51(
             opt.video_path,
             opt.annotation_path,
@@ -55,7 +55,7 @@ def get_training_set(opt, spatial_transform, temporal_transform,
 
 def get_validation_set(opt, spatial_transform, temporal_transform,
                        target_transform):
-    assert opt.dataset in ['kinetics', 'activitynet', 'ucf101', 'hmdb51', 'jhmdb', 'ucfsports', 'infar']
+    assert opt.dataset in ['kinetics', 'activitynet', 'ucf101', 'hmdb51', 'jhmdb', 'ucfsports', 'ucf11', 'infar', 'kth']
 
     if opt.dataset == 'kinetics':
         validation_data = Kinetics(
@@ -88,7 +88,7 @@ def get_validation_set(opt, spatial_transform, temporal_transform,
             temporal_transform,
             target_transform,
             sample_duration=opt.sample_duration)
-    elif opt.dataset in ['hmdb51','jhmdb','infar']:
+    elif opt.dataset in ['hmdb51','jhmdb','infar', 'ucf11', 'kth']:
         validation_data = HMDB51(
             opt.video_path,
             opt.annotation_path,
@@ -102,7 +102,7 @@ def get_validation_set(opt, spatial_transform, temporal_transform,
 
 
 def get_test_set(opt, spatial_transform, temporal_transform, target_transform):
-    assert opt.dataset in ['kinetics', 'activitynet', 'ucf101', 'hmdb51', 'jhmdb', 'ucfsports', 'infar']
+    assert opt.dataset in ['kinetics', 'activitynet', 'ucf101', 'hmdb51', 'jhmdb', 'ucfsports', 'ucf11', 'infar', 'kth']
     assert opt.test_subset in ['val', 'test']
 
     if opt.test_subset == 'val':
@@ -140,7 +140,7 @@ def get_test_set(opt, spatial_transform, temporal_transform, target_transform):
             temporal_transform,
             target_transform,
             sample_duration=opt.sample_duration)
-    elif opt.dataset in ['hmdb51','jhmdb','infar']:
+    elif opt.dataset in ['hmdb51','jhmdb','infar', 'ucf11', 'kth']:
         test_data = HMDB51(
             opt.video_path,
             opt.annotation_path,
