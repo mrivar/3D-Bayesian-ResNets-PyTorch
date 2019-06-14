@@ -22,6 +22,7 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger, uncertainty_log
     accuracies = AverageMeter()
     accuracies_mean = AverageMeter()
     accuracies_vote = AverageMeter()
+    confusion_matrix = ConfusionMatrix(opt.n_classes, opt.labels)
     conf = []
     m = math.ceil(len(data_loader) / opt.batch_size)
 
@@ -57,10 +58,11 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger, uncertainty_log
                 outputs = torch.cat((outputs, outputs_aux), 0)
                 losses.update(loss.data.detach().item(), inputs.size(0))
 
-        acc, acc_mean, acc_vote, res = calculate_test_accuracy(softmax(outputs, dim=1), targets, targets.repeat(opt.num_samples), opt)
+        acc, acc_mean, acc_vote, res, cm = calculate_test_accuracy(softmax(outputs, dim=1), targets, targets.repeat(opt.num_samples), opt)
         accuracies.update(acc, inputs.size(0))
         accuracies_mean.update(acc_mean, inputs.size(0))
         accuracies_vote.update(acc_vote, inputs.size(0))
+        confusion_matrix.update(cm)
 
         conf.append(res)
 
@@ -106,6 +108,10 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger, uncertainty_log
       'epistemic': epistemic, 'aleatoric': aleatoric,
       'random_param_mean': random_param_mean, 'random_param_log_alpha': random_param_log_alpha,
       'total_param_mean': total_param_mean, 'total_param_log_alpha': total_param_log_alpha})
+
+    if epoch % opt.plot_cm == 0:
+        confusion_matrix.normalize()
+        consufion_matrix.plot("%scm_%d.png"%(opt.result_path, epoch))
 
     if opt.bayesian:
       return losses_logpy.avg

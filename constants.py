@@ -1,5 +1,6 @@
 from time import strftime
 import os
+import json
 
 ROOT_PATH = {'mnist': None,
              'hmdb51': 'Data/HMDB51/',
@@ -14,7 +15,7 @@ VIDEO_PATH = {'mnist': None,
              'hmdb51': 'hmdb51_jpg/',
              'infar': 'jpg/',
              'jhmdb': 'JHMDB_jpg/',
-             'kth': 'jpg/'
+             'kth': 'jpg/',
              'ucf101': '',
              'ucf11': 'jpg/',
              'ucfsports': 'jpg/'}
@@ -73,3 +74,7 @@ def create_results_dir_name_with_counter(args):
       counter)
     if not os.path.isdir(name): break
   return name
+
+def load_labels(annotation_path):
+    with open(annotation_path, 'r') as data_file:
+        return json.load(data_file)['labels']
