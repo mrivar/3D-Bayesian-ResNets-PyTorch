@@ -300,7 +300,6 @@ def parse_opts():
     args.n_classes = NUM_CLASSES[args.dataset]
     args.bayesian = BAYESIAN[args.model]
     if not args.bayesian: args.num_samples = 1
-    args.labels = load_labels(args.annotation_path)
     args.result_path_logs = args.result_path or create_results_dir_name(args)
     args.result_path = args.result_path_logs + os.sep
 
@@ -323,6 +322,7 @@ def parse_opts():
     args.arch = '{}-{}'.format(args.model, args.model_depth)
     args.mean = get_mean(args.norm_value, dataset=args.mean_dataset)
     args.std = get_std(args.norm_value)
+    args.labels = load_labels(args.annotation_path)
     print(args)
     with open(args.result_path_logs+'_opts.json', 'w') as opt_file:
         json.dump(vars(args), opt_file)
