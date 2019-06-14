@@ -147,6 +147,7 @@ def parse_opts():
         help=
         'Training begins at this epoch. Previous trained model indicated by resume_path is loaded.'
     )
+    parser.add_argument('--plot_cm', default=25, type=int, help='Every how many epochs print a confusion matrix')
     parser.add_argument(
         '--n_val_samples',
         default=3,
@@ -299,6 +300,7 @@ def parse_opts():
     args.n_classes = NUM_CLASSES[args.dataset]
     args.bayesian = BAYESIAN[args.model]
     if not args.bayesian: args.num_samples = 1
+    args.labels = load_labels(args.annotation_path)
     args.result_path_logs = args.result_path or create_results_dir_name(args)
     args.result_path = args.result_path_logs + os.sep
 
@@ -307,8 +309,8 @@ def parse_opts():
         args.video_path = os.path.join(args.root_path, args.video_path)
         args.annotation_path = os.path.join(args.root_path, args.annotation_path)
         args.checkpoints_path = os.path.join(args.root_path, args.result_path)
-        #if not os.path.isdir(args.result_path):
-        #    os.makedirs(args.result_path)
+        if not os.path.isdir(args.result_path):
+            os.makedirs(args.result_path)
         if not os.path.isdir(args.checkpoints_path):
             os.makedirs(args.checkpoints_path)
         if args.resume_path:

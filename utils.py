@@ -1,7 +1,12 @@
 import torch
 import csv
 import os
-
+from sklearn.metrics import confusion_matrix
+import numpy as np
+from pandas import DataFrame
+from seaborn import heatmap
+import pylab
+from matplotlib.pyplot import cm as pltcm
 
 class AverageMeter(object):
     """Computes and stores the average and current value"""
@@ -49,6 +54,26 @@ class Logger(object):
         self.log_file.flush()
 
 
+class ConfusionMatrix(object):
+
+    def __init__(self, n_classes, labels):
+        self.cm = np.zeros((n_classes, n_classes))
+        self.labels = labels
+
+    def update(self, new_cm):
+        self.cm += new_cm
+
+    def normalize(self):
+        self.cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+
+    def plot(self, path):
+        df_cm = DataFrame(self.cm, index = self.labels, columns = self.labels)
+        pylab.figure()
+        heatmap(df_cm, annot=True, cmap=pltcm.Blues)
+        pylab.savefig(path)
+        pylab.clf()
+
+
 def load_value_file(file_path):
     with open(file_path, 'r') as input_file:
         value = float(input_file.read().rstrip('\n\r'))
@@ -87,7 +112,10 @@ def calculate_test_accuracy(outputs, targets, y, opt):
         correct_acc_vote = votes.eq(targets.data).sum().detach().item()
         acc_vote = 100*correct_acc_vote / batch_size
 
-    return acc, acc_mean, acc_vote, results[0].detach().item()
+    cm = confusion_matrix(targets.data.detach(), predicted_mean.data.detach())
+
+    return acc, acc_mean, acc_vote, results[0].detach().item(), cm
+
 
 def get_hms(seconds):
     m, s = divmod(seconds, 60)
