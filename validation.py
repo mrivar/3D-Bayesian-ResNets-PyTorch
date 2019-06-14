@@ -50,7 +50,7 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger, uncertainty_log
                     # Forward Propagation (with KL calc.)
                     outputs_aux, kl = model(inputs)
                     loss, logpy = criterion(outputs_aux, targets, kl, beta)
-                    losses_logpy.update(logpy.data.detach().item(), inputs.size(0))
+                    losses_logpy.update(logpy, inputs.size(0))
                 else:
                     outputs_aux = model(inputs)
                     loss = criterion(outputs_aux, targets)

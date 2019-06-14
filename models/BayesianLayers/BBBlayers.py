@@ -323,4 +323,4 @@ class GaussianVariationalInference(nn.Module):
 
         ll = logpy + beta * kl  # ELBO
 
-        return ll, logpy
+        return ll, logpy.data.detach().item()
