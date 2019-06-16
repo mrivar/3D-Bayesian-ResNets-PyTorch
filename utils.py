@@ -61,10 +61,15 @@ class ConfusionMatrix(object):
         self.labels = labels
 
     def update(self, new_cm):
-        self.cm += new_cm
+        try:
+            self.cm += new_cm
+        except:
+            print(self.cm.size())
+            print(cm.size())
+            self.cm += new_cm
 
     def normalize(self):
-        self.cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+        self.cm = self.cm.astype('float') / self.cm.sum(axis=1)[:, np.newaxis]
 
     def plot(self, path):
         df_cm = DataFrame(self.cm, index = self.labels, columns = self.labels)
@@ -111,8 +116,10 @@ def calculate_test_accuracy(outputs, targets, y, opt):
         votes, _ = pred.view(opt.num_samples, -1).mode(dim=0)
         correct_acc_vote = votes.eq(targets.data).sum().detach().item()
         acc_vote = 100*correct_acc_vote / batch_size
-
-    cm = confusion_matrix(targets.data.detach(), predicted_mean.data.detach())
+        # bayesian cm
+        cm = confusion_matrix(y_true=targets.cpu().detach().data, y_pred=predicted_mean.cpu().detach().data, labels=list(range(opt.n_classes)))
+    else:
+        cm = confusion_matrix(y_true=y.view(-1).cpu().detach().data, y_pred=pred.view(-1).cpu().detach().data, labels=list(range(opt.n_classes)))
 
     return acc, acc_mean, acc_vote, results[0].detach().item(), cm
 

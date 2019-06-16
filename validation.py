@@ -6,7 +6,7 @@ import time
 import sys
 import math
 
-from utils import AverageMeter, calculate_test_accuracy
+from utils import AverageMeter, calculate_test_accuracy, ConfusionMatrix
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
@@ -111,7 +111,7 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger, uncertainty_log
 
     if epoch % opt.plot_cm == 0:
         confusion_matrix.normalize()
-        consufion_matrix.plot("%scm_%d.png"%(opt.result_path, epoch))
+        confusion_matrix.plot("%scm_%d.png"%(opt.result_path, epoch))
 
     if opt.bayesian:
       return losses_logpy.avg
