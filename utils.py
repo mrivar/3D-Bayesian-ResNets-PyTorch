@@ -73,8 +73,11 @@ class ConfusionMatrix(object):
 
     def plot(self, path):
         df_cm = DataFrame(self.cm, index = self.labels, columns = self.labels)
-        pylab.figure()
-        heatmap(df_cm, annot=True, cmap=pltcm.Blues)
+        pylab.figure(figsize=(8,6.5))
+        im = heatmap(df_cm, annot=True, fmt=".2f", cmap=pltcm.Blues, vmin=0, vmax=1)
+        # Plot only values in diagonal
+        im.texts = [x for x in im.texts if x._x == x._y]
+        pylab.tight_layout()
         pylab.savefig(path)
         pylab.clf()
 
