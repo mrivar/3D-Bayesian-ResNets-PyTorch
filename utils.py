@@ -29,13 +29,13 @@ class AverageMeter(object):
 
 class Logger(object):
 
-    def __init__(self, path, header):
+    def __init__(self, path, header, resuming=None):
         write_header = True
-        #if os.path.isfile(path):
-        #    write_header = False
-        #self.log_file = open(path, 'a')
-
-        self.log_file = open(path, 'w+')
+        if resuming:#os.path.isfile(path):
+            write_header = False
+            self.log_file = open(path, 'a')
+        else:
+            self.log_file = open(path, 'w+')
         self.logger = csv.writer(self.log_file, delimiter='\t')
 
         if write_header: self.logger.writerow(header)

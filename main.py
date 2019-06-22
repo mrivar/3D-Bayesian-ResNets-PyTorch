@@ -78,10 +78,10 @@ if __name__ == '__main__':
             pin_memory=True)
         train_logger = Logger(
             opt.result_path_logs+'_train.log',
-            ['epoch', 'loss', 'acc', 'lr'])
+            ['epoch', 'loss', 'acc', 'lr'], bool(opt.resume_path))
         train_batch_logger = Logger(
             opt.result_path_logs+'_train_batch.log',
-            ['epoch', 'batch', 'iter', 'loss', 'acc', 'lr'])
+            ['epoch', 'batch', 'iter', 'loss', 'acc', 'lr'], bool(opt.resume_path))
 
         if opt.nesterov:
             dampening = 0
@@ -134,11 +134,11 @@ if __name__ == '__main__':
             num_workers=opt.n_threads,
             pin_memory=True)
         val_logger = Logger(
-            opt.result_path_logs+'_val.log', ['epoch', 'loss', 'acc', 'acc_mean', 'acc_vote'])
+            opt.result_path_logs+'_val.log', ['epoch', 'loss', 'acc', 'acc_mean', 'acc_vote'], bool(opt.resume_path))
         uncertainty_logger = Logger(
             opt.result_path_logs+'_uncertainty.log', ['epoch',
             'epistemic', 'aleatoric', 'random_param_mean', 'random_param_log_alpha',
-            'total_param_mean', 'total_param_log_alpha'])
+            'total_param_mean', 'total_param_log_alpha'], bool(opt.resume_path))
         del validation_data, target_transform, temporal_transform, spatial_transform
 
     if opt.resume_path:
