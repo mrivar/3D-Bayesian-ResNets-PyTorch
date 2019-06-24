@@ -2,13 +2,13 @@ import torch
 from torch import nn
 
 from models import resnet, pre_act_resnet, wide_resnet, resnext, densenet,\
-                BBBresnet
+                BBBresnet, dropout_resnet, fc_dropout_resnet
 
 
 def generate_model(opt):
     assert opt.model in [
         'resnet', 'preresnet', 'wideresnet', 'resnext', 'densenet',
-        'BBBresnet'
+        'BBBresnet', 'dropout_resnet', 'fc_dropout_resnet'
     ]
 
     if opt.model == 'resnet':
@@ -113,6 +113,74 @@ def generate_model(opt):
                 sample_size=opt.sample_size,
                 sample_duration=opt.sample_duration,
                 **BayesianKwargs)
+    elif opt.model == 'dropout_resnet':
+        assert opt.model_depth in [10, 18, 34]
+        from models.dropout_resnet import get_fine_tuning_parameters
+
+        if opt.model_depth == 10:
+            model = dropout_resnet.resnet10(
+                num_classes=opt.n_classes,
+                shortcut_type=opt.resnet_shortcut,
+                sample_size=opt.sample_size,
+                sample_duration=opt.sample_duration)
+        elif opt.model_depth == 18:
+            model = dropout_resnet.resnet18(
+                num_classes=opt.n_classes,
+                shortcut_type=opt.resnet_shortcut,
+                sample_size=opt.sample_size,
+                sample_duration=opt.sample_duration)
+        elif opt.model_depth == 34:
+            model = dropout_resnet.resnet34(
+                num_classes=opt.n_classes,
+                shortcut_type=opt.resnet_shortcut,
+                sample_size=opt.sample_size,
+                sample_duration=opt.sample_duration)
+    elif opt.model == 'fc_dropout_resnet':
+        assert opt.model_depth in [10, 18, 34, 50, 101, 152, 200]
+        from models.fc_dropout_resnet import get_fine_tuning_parameters
+
+        if opt.model_depth == 10:
+            model = fc_dropout_resnet.resnet10(
+                num_classes=opt.n_classes,
+                shortcut_type=opt.resnet_shortcut,
+                sample_size=opt.sample_size,
+                sample_duration=opt.sample_duration)
+        elif opt.model_depth == 18:
+            model = fc_dropout_resnet.resnet18(
+                num_classes=opt.n_classes,
+                shortcut_type=opt.resnet_shortcut,
+                sample_size=opt.sample_size,
+                sample_duration=opt.sample_duration)
+        elif opt.model_depth == 34:
+            model = fc_dropout_resnet.resnet34(
+                num_classes=opt.n_classes,
+                shortcut_type=opt.resnet_shortcut,
+                sample_size=opt.sample_size,
+                sample_duration=opt.sample_duration)
+        elif opt.model_depth == 50:
+            model = fc_dropout_resnet.resnet50(
+                num_classes=opt.n_classes,
+                shortcut_type=opt.resnet_shortcut,
+                sample_size=opt.sample_size,
+                sample_duration=opt.sample_duration)
+        elif opt.model_depth == 101:
+            model = fc_dropout_resnet.resnet101(
+                num_classes=opt.n_classes,
+                shortcut_type=opt.resnet_shortcut,
+                sample_size=opt.sample_size,
+                sample_duration=opt.sample_duration)
+        elif opt.model_depth == 152:
+            model = fc_dropout_resnet.resnet152(
+                num_classes=opt.n_classes,
+                shortcut_type=opt.resnet_shortcut,
+                sample_size=opt.sample_size,
+                sample_duration=opt.sample_duration)
+        elif opt.model_depth == 200:
+            model = fc_dropout_resnet.resnet200(
+                num_classes=opt.n_classes,
+                shortcut_type=opt.resnet_shortcut,
+                sample_size=opt.sample_size,
+                sample_duration=opt.sample_duration)
     elif opt.model == 'wideresnet':
         assert opt.model_depth in [50]
 
