@@ -29,7 +29,7 @@ def get_training_set(opt, spatial_transform, temporal_transform,
             temporal_transform=temporal_transform,
             target_transform=target_transform,
             sample_duration=opt.sample_duration)
-    elif opt.dataset == 'ucf101' or opt.dataset == 'ucfsports' or opt.dataset == 'ucf11':
+    elif opt.dataset == 'ucf101':
         training_data = UCF101(
             opt.video_path,
             opt.annotation_path,
@@ -39,7 +39,7 @@ def get_training_set(opt, spatial_transform, temporal_transform,
             temporal_transform=temporal_transform,
             target_transform=target_transform,
             sample_duration=opt.sample_duration)
-    elif opt.dataset in ['hmdb51', 'jhmdb', 'infar', 'kth']:
+    elif opt.dataset in ['hmdb51', 'jhmdb', 'infar', 'ucfsports', 'ucf11', 'kth']:
         training_data = HMDB51(
             opt.video_path,
             opt.annotation_path,
@@ -48,7 +48,8 @@ def get_training_set(opt, spatial_transform, temporal_transform,
             spatial_transform=spatial_transform,
             temporal_transform=temporal_transform,
             target_transform=target_transform,
-            sample_duration=opt.sample_duration)
+            sample_duration=opt.sample_duration,
+            img_channels=opt.img_channels)
 
     return training_data
 
@@ -78,7 +79,7 @@ def get_validation_set(opt, spatial_transform, temporal_transform,
             temporal_transform,
             target_transform,
             sample_duration=opt.sample_duration)
-    elif opt.dataset == 'ucf101' or opt.dataset == 'ucfsports':
+    elif opt.dataset == 'ucf101':
         validation_data = UCF101(
             opt.video_path,
             opt.annotation_path,
@@ -88,7 +89,7 @@ def get_validation_set(opt, spatial_transform, temporal_transform,
             temporal_transform,
             target_transform,
             sample_duration=opt.sample_duration)
-    elif opt.dataset in ['hmdb51','jhmdb','infar', 'ucf11', 'kth']:
+    elif opt.dataset in ['hmdb51','jhmdb','infar', 'ucfsports', 'ucf11', 'kth']:
         validation_data = HMDB51(
             opt.video_path,
             opt.annotation_path,
@@ -97,7 +98,8 @@ def get_validation_set(opt, spatial_transform, temporal_transform,
             spatial_transform,
             temporal_transform,
             target_transform,
-            sample_duration=opt.sample_duration)
+            sample_duration=opt.sample_duration,
+            img_channels=opt.img_channels)
     return validation_data
 
 
@@ -130,7 +132,7 @@ def get_test_set(opt, spatial_transform, temporal_transform, target_transform):
             temporal_transform,
             target_transform,
             sample_duration=opt.sample_duration)
-    elif opt.dataset == 'ucf101' or opt.dataset == 'ucfsports':
+    elif opt.dataset == 'ucf101':
         test_data = UCF101(
             opt.video_path,
             opt.annotation_path,
@@ -140,7 +142,7 @@ def get_test_set(opt, spatial_transform, temporal_transform, target_transform):
             temporal_transform,
             target_transform,
             sample_duration=opt.sample_duration)
-    elif opt.dataset in ['hmdb51','jhmdb','infar', 'ucf11', 'kth']:
+    elif opt.dataset in ['hmdb51','jhmdb','infar', 'ucfsports', 'ucf11', 'kth']:
         test_data = HMDB51(
             opt.video_path,
             opt.annotation_path,
@@ -149,6 +151,7 @@ def get_test_set(opt, spatial_transform, temporal_transform, target_transform):
             spatial_transform,
             temporal_transform,
             target_transform,
-            sample_duration=opt.sample_duration)
+            sample_duration=opt.sample_duration,
+            img_channels=opt.img_channels)
 
     return test_data

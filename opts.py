@@ -282,6 +282,7 @@ def parse_opts():
         default="Blundell",
         type=str,
         help='Beta type ( Bloendell | Soenderby | Standard | ')
+    parser.add_argument('--img_channels', '--imgc', default=3, type=int, choices=[3, 1], help='(3 or 1) -> (rgb or bw)')
     #parser.add_argument('--q_std_init',
     #    #default=5,
     #    type=float,

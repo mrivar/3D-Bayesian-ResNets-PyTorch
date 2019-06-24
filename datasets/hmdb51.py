@@ -1,5 +1,6 @@
 import torch
 import torch.utils.data as data
+import torchvision.transforms as tvt
 from PIL import Image
 import os
 import math
@@ -10,20 +11,20 @@ import copy
 from utils import load_value_file
 
 
-def pil_loader(path):
+def pil_loader(path, img_channels):
     # open path as file to avoid ResourceWarning (https://github.com/python-pillow/Pillow/issues/835)
     with open(path, 'rb') as f:
         with Image.open(f) as img:
-            return img.convert('RGB')
+            return tvt.functional.to_grayscale(img.convert('RGB'), num_output_channels=img_channels)
 
 
-def accimage_loader(path):
+def accimage_loader(path, img_channels):
     try:
         import accimage
-        return accimage.Image(path)
+        return tvt.functional.to_grayscale(accimage.Image(path), num_output_channels=img_channels)
     except IOError:
         # Potentially a decoding problem, fall back to PIL.Image
-        return pil_loader(path)
+        return pil_loader(path, img_channels)
 
 
 def get_default_image_loader():
@@ -46,8 +47,8 @@ def video_loader(video_dir_path, frame_indices, image_loader):
     return video
 
 
-def get_default_video_loader():
-    image_loader = get_default_image_loader()
+def get_default_video_loader(img_channels):
+    image_loader = functools.partial(get_default_image_loader(), img_channels=img_channels)
     return functools.partial(video_loader, image_loader=image_loader)
 
 
@@ -160,7 +161,8 @@ class HMDB51(data.Dataset):
                  temporal_transform=None,
                  target_transform=None,
                  sample_duration=16,
-                 get_loader=get_default_video_loader):
+                 get_loader=get_default_video_loader,
+                 img_channels=3):
         self.data, self.class_names = make_dataset(
             root_path, annotation_path, subset, n_samples_for_each_video,
             sample_duration)
@@ -168,7 +170,7 @@ class HMDB51(data.Dataset):
         self.spatial_transform = spatial_transform
         self.temporal_transform = temporal_transform
         self.target_transform = target_transform
-        self.loader = get_loader()
+        self.loader = get_loader(img_channels)
 
     def __getitem__(self, index):
         """
