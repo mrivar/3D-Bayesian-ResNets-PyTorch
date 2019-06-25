@@ -49,7 +49,9 @@ BAYESIAN = {'resnet': False,
             'wideresnet': False,
             'resnext': False,
             'densenet': False,
-            'BBBresnet': True}
+            'BBBresnet': True,
+            'dropout_resnet': False,
+            'fc_dropout_resnet': False}
 
 def create_results_dir_name(args):
   name = RESULT_PATH%(

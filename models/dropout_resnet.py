@@ -43,7 +43,7 @@ class BasicDropoutBlock(nn.Module):
         self.conv1 = conv3x3x3(inplanes, planes, stride)
         self.bn1 = nn.BatchNorm3d(planes)
         self.relu = nn.ReLU(inplace=True)
-        self.dropout = nn.Droout(p=0.2)
+        self.dropout = nn.Dropout(p=0.2)
         self.conv2 = conv3x3x3(planes, planes)
         self.bn2 = nn.BatchNorm3d(planes)
         self.downsample = downsample
