@@ -38,12 +38,12 @@ def downsample_basic_block(x, planes, stride):
 class BasicDropoutBlock(nn.Module):
     expansion = 1
 
-    def __init__(self, inplanes, planes, stride=1, downsample=None):
+    def __init__(self, inplanes, planes, stride=1, downsample=None, dropout_rate=0.2):
         super(BasicDropoutBlock, self).__init__()
         self.conv1 = conv3x3x3(inplanes, planes, stride)
         self.bn1 = nn.BatchNorm3d(planes)
         self.relu = nn.ReLU(inplace=True)
-        self.dropout = nn.Dropout(p=0.2)
+        self.dropout = nn.Dropout(p=dropout_rate)
         self.conv2 = conv3x3x3(planes, planes)
         self.bn2 = nn.BatchNorm3d(planes)
         self.downsample = downsample
@@ -218,20 +218,23 @@ def get_fine_tuning_parameters(model, ft_begin_index):
 def resnet10(**kwargs):
     """Constructs a DropoutResNet-18 model.
     """
-    model = DropoutResNet(BasicDropoutBlock, [1, 1, 1, 1], **kwargs)
+    block = partial(BasicDropoutBlock, dropout_rate=dropout_rate)
+    model = DropoutResNet(block, [1, 1, 1, 1], **kwargs)
     return model
 
 
 def resnet18(**kwargs):
     """Constructs a DropoutResNet-18 model.
     """
-    model = DropoutResNet(BasicDropoutBlock, [2, 2, 2, 2], **kwargs)
+    block = partial(BasicDropoutBlock, dropout_rate=dropout_rate)
+    model = DropoutResNet(block, [2, 2, 2, 2], **kwargs)
     return model
 
 
 def resnet34(**kwargs):
     """Constructs a DropoutResNet-34 model.
     """
-    model = DropoutResNet(BasicDropoutBlock, [3, 4, 6, 3], **kwargs)
+    block = partial(BasicDropoutBlock, dropout_rate=dropout_rate)
+    model = DropoutResNet(block, [3, 4, 6, 3], **kwargs)
     return model
 
