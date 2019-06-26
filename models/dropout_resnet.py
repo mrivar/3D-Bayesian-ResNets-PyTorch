@@ -113,6 +113,7 @@ class DropoutResNet(nn.Module):
 
     def __init__(self,
                  block,
+                 block_expansion,
                  layers,
                  sample_size,
                  sample_duration,
@@ -130,18 +131,18 @@ class DropoutResNet(nn.Module):
         self.bn1 = nn.BatchNorm3d(64)
         self.relu = nn.ReLU(inplace=True)
         self.maxpool = nn.MaxPool3d(kernel_size=(3, 3, 3), stride=2, padding=1)
-        self.layer1 = self._make_layer(block, 64, layers[0], shortcut_type)
+        self.layer1 = self._make_layer(block, block_expansion, 64, layers[0], shortcut_type)
         self.layer2 = self._make_layer(
-            block, 128, layers[1], shortcut_type, stride=2)
+            block, block_expansion, 128, layers[1], shortcut_type, stride=2)
         self.layer3 = self._make_layer(
-            block, 256, layers[2], shortcut_type, stride=2)
+            block, block_expansion, 256, layers[2], shortcut_type, stride=2)
         self.layer4 = self._make_layer(
-            block, 512, layers[3], shortcut_type, stride=2)
+            block, block_expansion, 512, layers[3], shortcut_type, stride=2)
         last_duration = int(math.ceil(sample_duration / 16))
         last_size = int(math.ceil(sample_size / 32))
         self.avgpool = nn.AvgPool3d(
             (last_duration, last_size, last_size), stride=1)
-        self.fc = nn.Linear(512 * block.expansion, num_classes)
+        self.fc = nn.Linear(512 * block_expansion, num_classes)
 
         for m in self.modules():
             if isinstance(m, nn.Conv3d):
@@ -150,26 +151,26 @@ class DropoutResNet(nn.Module):
                 m.weight.data.fill_(1)
                 m.bias.data.zero_()
 
-    def _make_layer(self, block, planes, blocks, shortcut_type, stride=1):
+    def _make_layer(self, block, block_expansion, planes, blocks, shortcut_type, stride=1):
         downsample = None
-        if stride != 1 or self.inplanes != planes * block.expansion:
+        if stride != 1 or self.inplanes != planes * block_expansion:
             if shortcut_type == 'A':
                 downsample = partial(
                     downsample_basic_block,
-                    planes=planes * block.expansion,
+                    planes=planes * block_expansion,
                     stride=stride)
             else:
                 downsample = nn.Sequential(
                     nn.Conv3d(
                         self.inplanes,
-                        planes * block.expansion,
+                        planes * block_expansion,
                         kernel_size=1,
                         stride=stride,
-                        bias=False), nn.BatchNorm3d(planes * block.expansion))
+                        bias=False), nn.BatchNorm3d(planes * block_expansion))
 
         layers = []
         layers.append(block(self.inplanes, planes, stride, downsample))
-        self.inplanes = planes * block.expansion
+        self.inplanes = planes * block_expansion
         for i in range(1, blocks):
             layers.append(block(self.inplanes, planes))
 
@@ -215,26 +216,26 @@ def get_fine_tuning_parameters(model, ft_begin_index):
     return parameters
 
 
-def resnet10(**kwargs):
-    """Constructs a DropoutResNet-18 model.
+def resnet10(dropout_rate=0.2, **kwargs):
+    """Constructs a DropoutResNet-10 model.
     """
     block = partial(BasicDropoutBlock, dropout_rate=dropout_rate)
-    model = DropoutResNet(block, [1, 1, 1, 1], **kwargs)
+    model = DropoutResNet(block, BasicDropoutBlock.expansion,  [1, 1, 1, 1], **kwargs)
     return model
 
 
-def resnet18(**kwargs):
+def resnet18(dropout_rate=0.2, **kwargs):
     """Constructs a DropoutResNet-18 model.
     """
     block = partial(BasicDropoutBlock, dropout_rate=dropout_rate)
-    model = DropoutResNet(block, [2, 2, 2, 2], **kwargs)
+    model = DropoutResNet(block, BasicDropoutBlock.expansion, [2, 2, 2, 2], **kwargs)
     return model
 
 
-def resnet34(**kwargs):
+def resnet34(dropout_rate=0.2, **kwargs):
     """Constructs a DropoutResNet-34 model.
     """
     block = partial(BasicDropoutBlock, dropout_rate=dropout_rate)
-    model = DropoutResNet(block, [3, 4, 6, 3], **kwargs)
+    model = DropoutResNet(block, BasicDropoutBlock.expansion, [3, 4, 6, 3], **kwargs)
     return model
 
