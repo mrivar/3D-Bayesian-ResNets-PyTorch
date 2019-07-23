@@ -150,6 +150,8 @@ if __name__ == '__main__':
         model.load_state_dict(checkpoint['state_dict'])
         if not opt.no_train:
             optimizer.load_state_dict(checkpoint['optimizer'])
+            for param_group in optimizer.param_groups:
+                param_group['lr'] = opt.learning_rate
         del checkpoint
 
     start_time = time()
