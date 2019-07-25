@@ -10,7 +10,8 @@ from plot_utils import *
 # iPython
 def ipypthon_plot_log(log_files, prefix, suffix='_valid.txt', col='acc', subplot=None, figure=None,
                       labels=None, colors = None, linestyles='-',
-                      legend_formatting=None, **kwargs):
+                      legend=True, legend_framealpha=0, legend_fontsize=None, legend_loc=4,
+                      **kwargs):
     logs_names = [f for f in log_files if f.endswith(suffix) and f.startswith(prefix)]
     logs_names.sort()
     logs = [load_csv(f) for f in logs_names]
@@ -18,13 +19,11 @@ def ipypthon_plot_log(log_files, prefix, suffix='_valid.txt', col='acc', subplot
         ax = figure.add_subplot(subplot or '111', **kwargs)
         ret = plot_against(logs, col, labels or logs_names, linestyles, colors, ax)
         ax.grid(color="#f1f1f4")
-        if legend_formatting: ax.legend(loc=4, framealpha=0)
-        else: ax.legend()
+        if legend: ax.legend(loc=legend_loc, framealpha=legend_framealpha, fontsize=legend_fontsize)
     else:
         ret = plot_against(logs, col, labels or logs_names, linestyles, colors)
         plt.grid(color="#f1f1f4")
-        if legend_formatting: plt.legend(loc=4, framealpha=0)
-        else: plt.legend()
+        if legend: plt.legend(loc=legend_loc, framealpha=legend_framealpha, fontsize=legend_fontsize)
         if subplot is not None: plt.subplot(subplot, **kwargs)
     return ret
 
@@ -72,6 +71,35 @@ def ipypthon_plot_sd(log_files, prefix, suffix='_uncertainty.log', what_layer="c
             plt.grid(color="#f1f1f4")
             #ax.legend()
 
+            
+def ipypthon_plot_sd_agains_acc(log_files, prefix, suffix='_uncertainty.log', what_layer="conv", what_sd='random', subplot=None, figure=None, marker_epoch=None, **kwargs):
+    logs_names = [f for f in log_files if f.endswith(suffix) and f.startswith(prefix) and 'BBB' in f]
+    assert len(logs_names) == 1, '%s'%(str(logs_names))
+    assert what_layer in ['conv', 'fc'] and what_sd in ['random', 'total']
+    f = logs_names[0]
+    log = load_csv(f)
+    val_acc = load_csv(f.replace('uncertainty', 'val'))['acc_mean'][:len(log)]
+    sds = get_sd_from_alpha(log[what_sd + '_param_log_alpha'], log[what_sd + '_param_mean'])
+    if what_layer == "fc": sds = get_sd_from_rho(log[what_sd + '_param_rho'])
+    if subplot is None:
+        plt.plot(log['epoch'], sds)
+        plt.grid(color="#f1f1f4")
+    else:
+        if figure is None:
+            plt.plot(log['epoch'], sds, color=blue)
+            plt.plot(log['epoch'], val_acc, color=blue, linestyle=':')
+            plt.grid(color="#f1f1f4")
+            plt.subplot(subplot, **kwargs)
+        else:
+            ax = figure.add_subplot(subplot, **kwargs)
+            ax2 = ax.twinx()
+            ax.plot(log['epoch'], sds, color=blue)
+            ax2.plot(log['epoch'], val_acc, color=blue, linestyle=':')
+            if marker_epoch: ax.plot(marker_epoch, sds[marker_epoch], marker="*", markersize=8.5, color=orange)
+            ax.grid(color="#f1f1f4")
+            #ax.legend()
+
+            
 
 def ipypthon_plot_unc(log_files, prefix, suffix='_uncertainty.log', subplot=None, figure=None, what_unc='epistemic', marker_epoch=None, **kwargs):
     logs_names = [f for f in log_files if f.endswith(suffix) and f.startswith(prefix) and 'BBB' in f]

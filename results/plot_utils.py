@@ -4,6 +4,7 @@ import numpy as np
 
 blue = '#1f77b4'
 orange = '#ff7f0e'
+green = '#2ca02c'
 gray = '#7f7f7f'
 
 def load_csv(name):
@@ -81,3 +82,14 @@ def get_max_valid_value_and_train(log_files, bayesian=True, contains=(''), xlim=
 
     
     
+def get_avg_uncertainty_values(log_files, contains=(''), midstring=''):
+    uncertainty_model = [f for f in log_files if 'BBB' in f and all(ss in f for ss in contains)][0]
+    epistemic = np.mean(load_csv(uncertainty_model)['epistemic'])
+    aleatoric = np.mean(load_csv(uncertainty_model)['aleatoric'])
+    print('%s: %sEpistemic: %f\tAleatoric: %f'%(uncertainty_model, midstring, epistemic, aleatoric))
+
+def get_last_uncertainty_values(log_files, contains=(''), midstring='', loc=-1):
+    uncertainty_model = [f for f in log_files if 'BBB' in f and all(ss in f for ss in contains)][0]
+    epistemic = load_csv(uncertainty_model)['epistemic'].iloc[loc]
+    aleatoric = load_csv(uncertainty_model)['aleatoric'].iloc[loc]
+    print('%s: %sEpistemic: %f\tAleatoric: %f'%(uncertainty_model, midstring, epistemic, aleatoric))    
